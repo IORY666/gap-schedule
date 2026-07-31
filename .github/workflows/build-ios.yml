@@ -7,26 +7,18 @@ on:
 
 jobs:
   build:
-    runs-on: macos-14      # Apple Silicon
+    runs-on: macos-14
 
     steps:
       - name: Checkout 代码
         uses: actions/checkout@v4
 
-      - name: 选择 Xcode 16
-        run: |
-          ls /Applications/ | grep Xcode
-          sudo xcode-select -s /Applications/Xcode_16.app/Contents/Developer 2>/dev/null || \
-          sudo xcode-select -s /Applications/Xcode_16.2.app/Contents/Developer 2>/dev/null || \
-          echo "Using default Xcode"
-          xcodebuild -version
+      - name: 查看 Xcode 版本
+        run: xcodebuild -version
 
-      - name: 安装 xcodegen
-        run: brew install xcodegen
-
-      - name: 生成 Xcode 项目
+      - name: 生成 project.pbxproj（Python脚本）
         working-directory: iOS
-        run: xcodegen generate
+        run: python3 generate_project.py
 
       - name: 构建 Archive（无签名）
         working-directory: iOS
@@ -40,6 +32,7 @@ jobs:
             CODE_SIGN_IDENTITY="" \
             CODE_SIGNING_REQUIRED=NO \
             CODE_SIGNING_ALLOWED=NO \
+            DEVELOPMENT_TEAM="" \
             -allowProvisioningUpdates 2>&1 | tail -30
 
       - name: 打包 IPA
