@@ -1,0 +1,735 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>📅 Gap 任务日历 · 2026年8月</title>
+<style>
+  :root {
+    --bg: #1a1b1e;
+    --surface: #25262b;
+    --surface-hover: #2c2e33;
+    --border: #373a40;
+    --text: #c1c2c5;
+    --text-dim: #909296;
+    --text-bright: #e0e0e0;
+    --accent: #f0a040;
+    --accent-glow: rgba(240, 160, 64, 0.25);
+    --green: #69db7c;
+    --green-bg: rgba(105, 219, 124, 0.12);
+    --blue: #74c0fc;
+    --blue-bg: rgba(116, 192, 252, 0.12);
+    --red: #ff6b6b;
+    --red-bg: rgba(255, 107, 107, 0.10);
+    --purple: #b197fc;
+    --orange: #ffa94d;
+    --cyan: #66d9e8;
+    --radius: 10px;
+    --radius-sm: 6px;
+    --font: 'Segoe UI', 'Microsoft YaHei', 'PingFang SC', system-ui, sans-serif;
+    --transition: 0.2s ease;
+  }
+
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+
+  html, body {
+    height: 100%;
+    background: transparent;
+    font-family: var(--font);
+    color: var(--text);
+    user-select: none;
+    -webkit-user-select: none;
+    overflow: hidden;
+  }
+
+  /* 主容器 - 毛玻璃效果面板 */
+  .widget {
+    width: 400px;
+    min-height: 100vh;
+    margin: 0 auto;
+    background: var(--bg);
+    border-left: 1px solid var(--border);
+    border-right: 1px solid var(--border);
+    display: flex;
+    flex-direction: column;
+    box-shadow: 0 0 60px rgba(0,0,0,0.5);
+  }
+
+  /* ===== 顶部栏 ===== */
+  .header {
+    padding: 16px 20px 12px;
+    border-bottom: 1px solid var(--border);
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    -webkit-app-region: drag;
+  }
+
+  .header-title {
+    font-size: 15px;
+    font-weight: 700;
+    color: var(--text-bright);
+    letter-spacing: 0.3px;
+  }
+  .header-title span { color: var(--accent); }
+
+  .header-date {
+    font-size: 12px;
+    color: var(--text-dim);
+    text-align: right;
+    line-height: 1.4;
+  }
+
+  /* ===== 月份导航 ===== */
+  .month-nav {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 10px 20px;
+    -webkit-app-region: no-drag;
+  }
+
+  .month-nav button {
+    width: 30px; height: 30px;
+    border: 1px solid var(--border);
+    border-radius: var(--radius-sm);
+    background: var(--surface);
+    color: var(--text);
+    cursor: pointer;
+    font-size: 14px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: all var(--transition);
+  }
+  .month-nav button:hover {
+    background: var(--surface-hover);
+    border-color: var(--text-dim);
+  }
+
+  .month-label {
+    font-size: 16px;
+    font-weight: 700;
+    color: var(--text-bright);
+    letter-spacing: 0.5px;
+  }
+
+  /* ===== 日历网格 ===== */
+  .calendar-wrap {
+    padding: 0 16px;
+  }
+
+  .weekday-row {
+    display: grid;
+    grid-template-columns: repeat(7, 1fr);
+    text-align: center;
+    padding: 6px 0;
+    font-size: 11px;
+    font-weight: 600;
+    color: var(--text-dim);
+    letter-spacing: 0.5px;
+  }
+
+  .weekday-row .sat { color: var(--blue); }
+  .weekday-row .sun { color: var(--red); }
+
+  .days-grid {
+    display: grid;
+    grid-template-columns: repeat(7, 1fr);
+    gap: 3px;
+  }
+
+  .day-cell {
+    aspect-ratio: 1;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 13px;
+    font-weight: 500;
+    border-radius: var(--radius-sm);
+    cursor: pointer;
+    transition: all var(--transition);
+    position: relative;
+    color: var(--text);
+  }
+
+  .day-cell:hover {
+    background: var(--surface-hover);
+  }
+
+  .day-cell.other-month {
+    color: var(--text-dim);
+    opacity: 0.35;
+    cursor: default;
+  }
+  .day-cell.other-month:hover { background: transparent; }
+
+  .day-cell.sat { color: var(--blue); }
+  .day-cell.sun { color: var(--red); }
+
+  .day-cell.today {
+    background: var(--accent);
+    color: #1a1b1e !important;
+    font-weight: 700;
+    box-shadow: 0 2px 12px var(--accent-glow);
+  }
+
+  .day-cell.selected {
+    outline: 2px solid var(--accent);
+    outline-offset: -2px;
+  }
+
+  .day-cell.rest-day::after {
+    content: '';
+    position: absolute;
+    bottom: 3px;
+    width: 4px; height: 4px;
+    background: var(--green);
+    border-radius: 50%;
+  }
+  .day-cell.today.rest-day::after {
+    background: #1a1b1e;
+  }
+
+  /* ===== 分隔线 + 当日标签 ===== */
+  .divider {
+    margin: 12px 20px;
+    border: none;
+    border-top: 1px solid var(--border);
+  }
+
+  .day-header {
+    padding: 0 20px 6px;
+    display: flex;
+    align-items: center;
+    gap: 10px;
+  }
+
+  .day-badge {
+    font-size: 12px;
+    font-weight: 700;
+    padding: 3px 10px;
+    border-radius: 20px;
+    letter-spacing: 0.5px;
+  }
+  .day-badge.train {
+    background: var(--accent-glow);
+    color: var(--accent);
+  }
+  .day-badge.rest {
+    background: var(--green-bg);
+    color: var(--green);
+  }
+
+  .selected-date-label {
+    font-size: 13px;
+    font-weight: 600;
+    color: var(--text-bright);
+  }
+
+  /* ===== 任务时间线 ===== */
+  .timeline {
+    padding: 4px 20px 20px;
+    flex: 1;
+    overflow-y: auto;
+  }
+  .timeline::-webkit-scrollbar { width: 4px; }
+  .timeline::-webkit-scrollbar-thumb { background: var(--border); border-radius: 2px; }
+
+  .task-item {
+    display: flex;
+    align-items: flex-start;
+    gap: 10px;
+    padding: 8px 10px;
+    border-radius: var(--radius-sm);
+    transition: all var(--transition);
+    cursor: pointer;
+    position: relative;
+  }
+  .task-item:hover { background: var(--surface-hover); }
+  .task-item.current {
+    background: var(--surface);
+    border-left: 3px solid var(--accent);
+    margin-left: -3px;
+  }
+
+  .task-emoji {
+    font-size: 18px;
+    width: 24px;
+    text-align: center;
+    flex-shrink: 0;
+    line-height: 1.3;
+  }
+
+  .task-info { flex: 1; min-width: 0; }
+
+  .task-time {
+    font-size: 11px;
+    font-weight: 700;
+    color: var(--accent);
+    letter-spacing: 0.5px;
+    margin-bottom: 1px;
+  }
+
+  .task-name {
+    font-size: 13px;
+    font-weight: 500;
+    color: var(--text-bright);
+  }
+
+  .task-detail {
+    font-size: 11px;
+    color: var(--text-dim);
+    margin-top: 1px;
+  }
+
+  .task-check {
+    width: 20px; height: 20px;
+    border-radius: 50%;
+    border: 2px solid var(--border);
+    flex-shrink: 0;
+    cursor: pointer;
+    transition: all var(--transition);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 11px;
+    margin-top: 2px;
+    background: transparent;
+  }
+  .task-check:hover {
+    border-color: var(--green);
+  }
+  .task-check.done {
+    background: var(--green);
+    border-color: var(--green);
+    color: var(--bg);
+  }
+  .task-item.completed .task-name {
+    text-decoration: line-through;
+    opacity: 0.5;
+  }
+  .task-item.completed .task-time { opacity: 0.5; }
+
+  /* ===== 休息日卡片 ===== */
+  .rest-card {
+    margin: 0 20px 16px;
+    padding: 16px;
+    background: var(--green-bg);
+    border: 1px solid rgba(105,219,124,0.2);
+    border-radius: var(--radius);
+    text-align: center;
+  }
+
+  .rest-card .rest-icon { font-size: 32px; margin-bottom: 6px; }
+  .rest-card .rest-title {
+    font-size: 15px;
+    font-weight: 700;
+    color: var(--green);
+    margin-bottom: 4px;
+  }
+  .rest-card .rest-suggestions {
+    font-size: 12px;
+    color: var(--text-dim);
+    line-height: 1.8;
+  }
+
+  /* ===== 底部状态栏 ===== */
+  .footer {
+    padding: 10px 20px;
+    border-top: 1px solid var(--border);
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    font-size: 11px;
+    color: var(--text-dim);
+  }
+
+  .progress-wrap {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+  }
+  .progress-bar {
+    width: 80px; height: 4px;
+    background: var(--border);
+    border-radius: 2px;
+    overflow: hidden;
+  }
+  .progress-fill {
+    height: 100%;
+    background: var(--accent);
+    border-radius: 2px;
+    transition: width 0.5s ease;
+  }
+
+  .legend { display: flex; gap: 12px; }
+  .legend-item {
+    display: flex; align-items: center; gap: 4px;
+    font-size: 10px;
+  }
+  .legend-dot {
+    width: 7px; height: 7px;
+    border-radius: 50%;
+  }
+  .legend-dot.train-dot { background: var(--accent); }
+  .legend-dot.rest-dot { background: var(--green); }
+
+  /* ===== 响应式：拖动改变大小 ===== */
+  @media (max-width: 360px) {
+    .widget { width: 100%; }
+    .day-cell { font-size: 11px; }
+  }
+
+  /* 淡入动画 */
+  @keyframes fadeIn {
+    from { opacity: 0; transform: translateY(8px); }
+    to   { opacity: 1; transform: translateY(0); }
+  }
+  .timeline { animation: fadeIn 0.35s ease; }
+</style>
+</head>
+<body>
+<div class="widget">
+
+  <!-- 顶部 -->
+  <div class="header">
+    <div class="header-title">🔥 <span>Gap</span> 任务日历</div>
+    <div class="header-date" id="realTimeClock">--</div>
+  </div>
+
+  <!-- 月份导航 -->
+  <div class="month-nav">
+    <button onclick="changeMonth(-1)" title="上月">◀</button>
+    <div class="month-label" id="monthLabel">2026年 8月</div>
+    <button onclick="changeMonth(1)" title="下月">▶</button>
+    <button onclick="goToday()" style="width:auto;padding:0 10px;font-size:11px;" title="回到今天">今天</button>
+  </div>
+
+  <!-- 日历 -->
+  <div class="calendar-wrap">
+    <div class="weekday-row">
+      <div class="sun">日</div><div>一</div><div>二</div><div>三</div><div>四</div><div>五</div><div class="sat">六</div>
+    </div>
+    <div class="days-grid" id="daysGrid"></div>
+  </div>
+
+  <hr class="divider">
+
+  <!-- 当日标签 -->
+  <div class="day-header" id="dayHeader">
+    <div class="day-badge train" id="dayBadge">训练日</div>
+    <div class="selected-date-label" id="selectedDateLabel">8月3日 周一</div>
+  </div>
+
+  <!-- 任务时间线 -->
+  <div class="timeline" id="timeline"></div>
+
+  <!-- 休息日卡片（默认隐藏） -->
+  <div class="rest-card" id="restCard" style="display:none;">
+    <div class="rest-icon">🌴</div>
+    <div class="rest-title">休息日 · 放松充电</div>
+    <div class="rest-suggestions">
+      🛌 睡到自然醒<br>
+      📖 轻松复习或阅读<br>
+      🎮 娱乐放松<br>
+      🏃 可选：轻度有氧<br>
+      🍳 做一顿好吃的犒劳自己
+    </div>
+  </div>
+
+  <!-- 底部 -->
+  <div class="footer">
+    <div class="progress-wrap">
+      今日进度
+      <div class="progress-bar"><div class="progress-fill" id="progressFill" style="width:0%"></div></div>
+      <span id="progressText">0/11</span>
+    </div>
+    <div class="legend">
+      <div class="legend-item"><span class="legend-dot train-dot"></span>训练</div>
+      <div class="legend-item"><span class="legend-dot rest-dot"></span>休息</div>
+    </div>
+  </div>
+
+</div>
+
+<script>
+// ============ 核心数据 ============
+const TRAIN_SCHEDULE = [
+  { emoji:'🏃', time:'07:00-07:45', name:'空腹有氧', detail:'快走/慢跑/跳绳 45分钟', cat:'cardio' },
+  { emoji:'🧹', time:'07:45-08:00', name:'洗漱整理', detail:'冲澡、换衣服', cat:'routine' },
+  { emoji:'🛒', time:'08:00-08:30', name:'买菜', detail:'步行去菜市场/超市', cat:'routine' },
+  { emoji:'☕', time:'08:30-09:00', name:'早餐', detail:'健康早餐，补充蛋白质', cat:'meal' },
+  { emoji:'📖', time:'09:00-11:30', name:'背面试题 · 上午', detail:'专注刷题 2.5小时 · 中间休息10分钟', cat:'study' },
+  { emoji:'🍳', time:'11:30-12:30', name:'做午饭', detail:'简单营养午餐', cat:'meal' },
+  { emoji:'🍽️', time:'12:30-14:00', name:'午餐 + 午休', detail:'饭后休息30分钟后午睡', cat:'meal' },
+  { emoji:'📖', time:'14:00-16:00', name:'背面试题 · 下午', detail:'专注刷题 2小时', cat:'study' },
+  { emoji:'📤', time:'16:00-17:00', name:'投简历', detail:'Boss直聘/拉钩/脉脉 · 每天投5-10家', cat:'job' },
+  { emoji:'🍳', time:'17:00-18:00', name:'做晚饭', detail:'自己做饭，健康饮食', cat:'meal' },
+  { emoji:'🍽️', time:'18:00-19:00', name:'晚餐 + 休息', detail:'饭后散步或放松', cat:'meal' },
+  { emoji:'💪', time:'19:00-20:20', name:'力量训练 + 35min有氧', detail:'力量45分钟 + 有氧35分钟', cat:'workout' },
+  { emoji:'🛀', time:'20:20-21:00', name:'洗漱放松', detail:'冲澡、复盘今日、规划明日', cat:'routine' },
+  { emoji:'😴', time:'22:30-23:00', name:'睡觉', detail:'保证7-8小时睡眠 · 放下手机', cat:'routine' },
+];
+
+const WEEKDAY_NAMES = ['周日','周一','周二','周三','周四','周五','周六'];
+
+// ============ 状态 ============
+let currentYear = 2026;
+let currentMonth = 8;   // 1-based
+let selectedDate = { y:2026, m:8, d: new Date().getDate() };
+let todayKey = '';       // '2026-8-3'
+
+// ============ 工具函数 ============
+function dateKey(y,m,d) { return `${y}-${m}-${d}`; }
+
+function getToday() {
+  const now = new Date();
+  return { y:now.getFullYear(), m:now.getMonth()+1, d:now.getDate() };
+}
+
+function isRestDay(y,m,d) {
+  const dow = new Date(y, m-1, d).getDay();
+  return dow === 6; // 周六休息
+}
+
+function getDayOfWeek(y,m,d) {
+  return new Date(y, m-1, d).getDay();
+}
+
+function daysInMonth(y,m) {
+  return new Date(y, m, 0).getDate();
+}
+
+function firstDayOfMonth(y,m) {
+  return new Date(y, m-1, 1).getDay();
+}
+
+// ============ 渲染 ============
+function renderCalendar() {
+  const grid = document.getElementById('daysGrid');
+  const totalDays = daysInMonth(currentYear, currentMonth);
+  const firstDow = firstDayOfMonth(currentYear, currentMonth);
+  const today = getToday();
+  const tk = dateKey(today.y, today.m, today.d);
+  todayKey = tk;
+
+  let html = '';
+  const totalCells = Math.ceil((firstDow + totalDays) / 7) * 7;
+
+  for (let i = 0; i < totalCells; i++) {
+    const dayNum = i - firstDow + 1;
+    const isCurrentMonth = dayNum >= 1 && dayNum <= totalDays;
+    const d = isCurrentMonth ? dayNum : (dayNum <= 0 ? daysInMonth(currentYear, currentMonth-1 || 12) + dayNum : dayNum - totalDays);
+    const actualM = isCurrentMonth ? currentMonth : (dayNum <= 0 ? (currentMonth-1 || 12) : (currentMonth+1 > 12 ? 1 : currentMonth+1));
+    const actualY = isCurrentMonth ? currentYear : (dayNum <= 0 ? (currentMonth===1 ? currentYear-1 : currentYear) : (currentMonth===12 ? currentYear+1 : currentYear));
+
+    const key = dateKey(actualY, actualM, d);
+    const isToday = key === tk;
+    const sk = dateKey(selectedDate.y, selectedDate.m, selectedDate.d);
+    const isSelected = key === sk;
+    const dow = getDayOfWeek(actualY, actualM, d);
+    const isSat = dow === 6;
+    const isSun = dow === 0;
+    const isRest = isSat && isCurrentMonth;
+
+    let cls = 'day-cell';
+    if (!isCurrentMonth) cls += ' other-month';
+    if (isSat) cls += ' sat';
+    if (isSun) cls += ' sun';
+    if (isToday) cls += ' today';
+    if (isSelected && !isToday) cls += ' selected';
+    if (isRest) cls += ' rest-day';
+
+    html += `<div class="${cls}" data-key="${key}" data-y="${actualY}" data-m="${actualM}" data-d="${d}" onclick="selectDate(${actualY},${actualM},${d})" title="${actualY}/${actualM}/${d} ${WEEKDAY_NAMES[dow]}${isRest?' · 休息日':''}">${d}</div>`;
+  }
+
+  grid.innerHTML = html;
+
+  // 标题
+  document.getElementById('monthLabel').textContent = `${currentYear}年 ${currentMonth}月`;
+}
+
+function renderDayDetail() {
+  const y = selectedDate.y, m = selectedDate.m, d = selectedDate.d;
+  const dow = getDayOfWeek(y,m,d);
+  const isRest = isRestDay(y,m,d);
+  const labelEl = document.getElementById('selectedDateLabel');
+  const badgeEl = document.getElementById('dayBadge');
+  const timelineEl = document.getElementById('timeline');
+  const restCardEl = document.getElementById('restCard');
+
+  labelEl.textContent = `${m}月${d}日 ${WEEKDAY_NAMES[dow]}`;
+
+  if (isRest) {
+    badgeEl.textContent = '休息日';
+    badgeEl.className = 'day-badge rest';
+    timelineEl.style.display = 'none';
+    restCardEl.style.display = 'block';
+    updateProgress(0,0);
+  } else {
+    badgeEl.textContent = '训练日';
+    badgeEl.className = 'day-badge train';
+    timelineEl.style.display = 'block';
+    restCardEl.style.display = 'none';
+
+    const now = new Date();
+    const nowMin = now.getHours() * 60 + now.getMinutes();
+    const isToday = dateKey(y,m,d) === todayKey;
+
+    // 读取今日勾选状态
+    const checks = JSON.parse(localStorage.getItem('gap-checks-'+dateKey(y,m,d)) || '{}');
+
+    let html = '';
+    TRAIN_SCHEDULE.forEach((task, i) => {
+      // 判断是否为当前时间段
+      const [startStr, endStr] = task.time.includes('-') ? task.time.split('-') : [task.time, task.time];
+      const [sh, sm] = (startStr||'00:00').split(':').map(Number);
+      let [eh, em] = (endStr||'00:00').split(':').map(Number);
+      if (isNaN(eh)) { eh = sh; em = sm; }
+      const startMin = sh*60+sm;
+      const endMin = eh*60+em;
+      const isCurrent = isToday && nowMin >= startMin && nowMin < endMin;
+
+      let cls = 'task-item';
+      if (isCurrent) cls += ' current';
+      if (checks[i]) cls += ' completed';
+
+      const timeDisplay = task.time.includes('-') ? task.time : task.time;
+
+      html += `
+        <div class="${cls}" data-index="${i}">
+          <div class="task-emoji">${task.emoji}</div>
+          <div class="task-info">
+            <div class="task-time">${timeDisplay}</div>
+            <div class="task-name">${task.name}</div>
+            <div class="task-detail">${task.detail}</div>
+          </div>
+          <div class="task-check${checks[i]?' done':''}" onclick="event.stopPropagation();toggleTask(${i})">${checks[i]?'✓':''}</div>
+        </div>`;
+    });
+
+    timelineEl.innerHTML = html;
+
+    // 滚动到当前任务
+    if (isToday) {
+      const currentEl = timelineEl.querySelector('.current');
+      if (currentEl) {
+        setTimeout(() => currentEl.scrollIntoView({ block:'center', behavior:'smooth' }), 300);
+      }
+    }
+
+    // 更新进度
+    const doneCount = Object.values(checks).filter(v=>v).length;
+    updateProgress(doneCount, TRAIN_SCHEDULE.length);
+  }
+
+  // 高亮日历中的选中日期
+  document.querySelectorAll('.day-cell.selected').forEach(el => el.classList.remove('selected'));
+  const sk = dateKey(y,m,d);
+  const cell = document.querySelector(`.day-cell[data-key="${sk}"]`);
+  if (cell && !cell.classList.contains('today')) cell.classList.add('selected');
+}
+
+function updateProgress(done, total) {
+  const pct = total > 0 ? Math.round(done/total*100) : 0;
+  document.getElementById('progressFill').style.width = pct + '%';
+  document.getElementById('progressText').textContent = done+'/'+total;
+}
+
+// ============ 交互 ============
+function selectDate(y,m,d) {
+  selectedDate = { y, m, d };
+  renderDayDetail();
+}
+
+function toggleTask(index) {
+  const key = dateKey(selectedDate.y, selectedDate.m, selectedDate.d);
+  const checks = JSON.parse(localStorage.getItem('gap-checks-'+key) || '{}');
+  checks[index] = !checks[index];
+  localStorage.setItem('gap-checks-'+key, JSON.stringify(checks));
+  renderDayDetail();
+}
+
+function changeMonth(delta) {
+  currentMonth += delta;
+  if (currentMonth > 12) { currentMonth = 1; currentYear++; }
+  if (currentMonth < 1)  { currentMonth = 12; currentYear--; }
+  renderCalendar();
+}
+
+function goToday() {
+  const t = getToday();
+  currentYear = t.y;
+  currentMonth = t.m;
+  selectedDate = t;
+  renderCalendar();
+  renderDayDetail();
+}
+
+// ============ 实时时钟 ============
+function updateClock() {
+  const now = new Date();
+  const h = String(now.getHours()).padStart(2,'0');
+  const m = String(now.getMinutes()).padStart(2,'0');
+  const s = String(now.getSeconds()).padStart(2,'0');
+  document.getElementById('realTimeClock').textContent = `${h}:${m}:${s}`;
+
+  // 每分钟刷新任务高亮
+  if (now.getSeconds() === 0) {
+    const key = dateKey(selectedDate.y, selectedDate.m, selectedDate.d);
+    if (key === todayKey) renderDayDetail();
+  }
+}
+setInterval(updateClock, 1000);
+updateClock();
+
+// ============ 每日重置勾选（过期日期的勾选不清除，但新的一天自动清空） ============
+function dailyReset() {
+  const today = getToday();
+  const tk = dateKey(today.y, today.m, today.d);
+  // 清理非当月的勾选缓存（保留7天内）
+  const allKeys = Object.keys(localStorage).filter(k => k.startsWith('gap-checks-'));
+  const sevenDaysAgo = new Date();
+  sevenDaysAgo.setDate(sevenDaysAgo.getDate() - 7);
+  allKeys.forEach(k => {
+    const parts = k.replace('gap-checks-','').split('-').map(Number);
+    const d = new Date(parts[0], parts[1]-1, parts[2]);
+    if (d < sevenDaysAgo) localStorage.removeItem(k);
+  });
+}
+dailyReset();
+
+// ============ 键盘导航 ============
+document.addEventListener('keydown', e => {
+  if (e.key === 'ArrowLeft')  changeMonth(-1);
+  if (e.key === 'ArrowRight') changeMonth(1);
+  if (e.key === 't' || e.key === 'T') goToday();
+});
+
+// ============ 初始化 ============
+function init() {
+  const today = getToday();
+  // 默认展示今天，如果今天不是8月则显示8月
+  if (today.m === 8 && today.y === 2026) {
+    selectedDate = today;
+    currentMonth = 8;
+    currentYear = 2026;
+  } else {
+    // 8月1日开始
+    selectedDate = { y:2026, m:8, d:1 };
+    currentMonth = 8;
+    currentYear = 2026;
+  }
+  renderCalendar();
+  renderDayDetail();
+}
+init();
+
+console.log('🔥 Gap任务日历已就绪 · 2026年8月');
+console.log('💡 提示：点击日历切换日期 | 点击 ○ 勾选完成任务');
+console.log('📌 周六 = 休息日 | 周日至周五 = 训练日');
+console.log('⌨️ 快捷键：← → 切换月份 | T 回到今天');
+</script>
+</body>
+</html>

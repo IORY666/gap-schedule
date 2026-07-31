@@ -1,0 +1,21 @@
+# Python
+__pycache__/
+*.pyc
+.gap_checks.json
+
+# Voice cache
+voice/
+
+# macOS
+.DS_Store
+*.xcarchive
+build/
+
+# Xcode
+*.xcuserdata
+DerivedData/
+*.xcworkspace/xcuserdata/
+
+# IDE
+.vscode/
+.idea/

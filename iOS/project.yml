@@ -1,0 +1,31 @@
+name: GapSchedule
+options:
+  bundleIdPrefix: com.gap
+  deploymentTarget:
+    iOS: "16.0"
+  xcodeVersion: "15.0"
+
+settings:
+  base:
+    SWIFT_VERSION: "5.9"
+
+targets:
+  GapSchedule:
+    type: application
+    platform: iOS
+    sources:
+      - path: GapSchedule
+        type: group
+    settings:
+      base:
+        PRODUCT_BUNDLE_IDENTIFIER: com.gap.schedule
+        INFOPLIST_FILE: Info.plist
+        ASSETCATALOG_COMPILER_APPICON_NAME: AppIcon
+        DEVELOPMENT_TEAM: ""
+        CODE_SIGN_IDENTITY: "iPhone Developer"
+        CODE_SIGN_STYLE: Automatic
+    preBuildScripts:
+      - name: "SwiftLint"
+        script: |
+          echo "Build started at $(date)"
+        basedOnDependencyAnalysis: false

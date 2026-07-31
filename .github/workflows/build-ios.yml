@@ -1,0 +1,51 @@
+name: Build iOS IPA
+
+on:
+  push:
+    branches: [main, master]
+  workflow_dispatch:       # 手动触发
+
+jobs:
+  build:
+    runs-on: macos-14      # Apple Silicon, 免费额度够用
+
+    steps:
+      - name: Checkout 代码
+        uses: actions/checkout@v4
+
+      - name: 安装 xcodegen
+        run: brew install xcodegen
+
+      - name: 生成 Xcode 项目
+        working-directory: iOS
+        run: xcodegen generate
+
+      - name: 构建 Archive（无签名）
+        working-directory: iOS
+        run: |
+          xcodebuild archive \
+            -project GapSchedule.xcodeproj \
+            -scheme GapSchedule \
+            -sdk iphoneos \
+            -configuration Release \
+            -archivePath build/GapSchedule.xcarchive \
+            CODE_SIGN_IDENTITY="" \
+            CODE_SIGNING_REQUIRED=NO \
+            CODE_SIGNING_ALLOWED=NO \
+            -allowProvisioningUpdates 2>&1 | tail -20
+
+      - name: 打包 IPA
+        working-directory: iOS
+        run: |
+          mkdir -p Payload
+          cp -R build/GapSchedule.xcarchive/Products/Applications/GapSchedule.app Payload/
+          zip -r GapSchedule.ipa Payload
+          rm -rf Payload
+          ls -lh GapSchedule.ipa
+
+      - name: 上传 IPA
+        uses: actions/upload-artifact@v4
+        with:
+          name: GapSchedule-iOS
+          path: iOS/GapSchedule.ipa
+          retention-days: 30
