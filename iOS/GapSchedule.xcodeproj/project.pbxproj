@@ -7,88 +7,87 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
-		6EE15F86CE9F4CA49F4AB43E /* GapScheduleApp.swift in Sources */ = {isa = PBXBuildFile; fileRef = A69A1DDA97F44B3BA711A158 /* GapScheduleApp.swift */; };
-		2FA1B723347D41DFAE60C7DB /* ContentView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8CAAEE2E8A14481DA64E0D1F /* ContentView.swift */; };
-		2E2B134198CD49B4A92CB73F /* TaskData.swift in Sources */ = {isa = PBXBuildFile; fileRef = 25C9210ED2754EDFB4B93F10 /* TaskData.swift */; };
-		27A1FDEF32F3426C8386FF70 /* CalendarGridView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7AFD6C9B99D84A73919F17F5 /* CalendarGridView.swift */; };
-		4B54A4E1F0664D708D18A31B /* TaskRowView.swift in Sources */ = {isa = PBXBuildFile; fileRef = AE1A26092EFF4D60A7C0DB7C /* TaskRowView.swift */; };
-		66D9F31B7E2145DCB080465D /* ReminderPopupView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3FE340A819B3421B8EE68FD7 /* ReminderPopupView.swift */; };
-		7834ADD35DBE495CB9186FB0 /* NotificationManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = 28DFA24209BE471B8A1D42D0 /* NotificationManager.swift */; };
-		3658A5474C124FD8B8FA5450 /* ScheduleManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5AE6B212CCE74AB8913C895A /* ScheduleManager.swift */; };
-		448417F67EE448B7A27F2890 /* SpeechManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = 06408C1270F0455993635A72 /* SpeechManager.swift */; };
-		F05988E26BA54D2D8A26AEE6 /* Info.plist in Resources */ = {isa = PBXBuildFile; fileRef = 646241DCBF754E6DA211BD59 /* Info.plist */; };
+		A683367B4A56474C948C2A2A /* GapScheduleApp.swift in Sources */ = {isa = PBXBuildFile; fileRef = 645AF5A7CA54491CA02F06B0 /* GapScheduleApp.swift */; };
+		1DA7A53CC7764DED8144F218 /* ContentView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8F12186E042C40D9ABD0CE56 /* ContentView.swift */; };
+		E4DCFAFA1FC74B669A996AEB /* TaskData.swift in Sources */ = {isa = PBXBuildFile; fileRef = C1A90EDC466E4153AEC703D4 /* TaskData.swift */; };
+		68C39E4534334AC4A307370A /* CalendarGridView.swift in Sources */ = {isa = PBXBuildFile; fileRef = EC4D0AA49DC44FE69014E7D4 /* CalendarGridView.swift */; };
+		2326B7BEDBB849F08252FBF4 /* TaskRowView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 57EA7F86E7ED4D9DBF4F2730 /* TaskRowView.swift */; };
+		2571BB8352E94D54BCDFA049 /* ReminderPopupView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2182CEADF0CF443EA8D0E3C5 /* ReminderPopupView.swift */; };
+		D3BE7868193E4A72A4780201 /* NotificationManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = A3F27976B536426A91A393C1 /* NotificationManager.swift */; };
+		55761E92C9874EB684B8DD7F /* ScheduleManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = 30C5AFC3D7AF41C3B801AE63 /* ScheduleManager.swift */; };
+		8B821ECCE388476E9E068105 /* SpeechManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = 38DED031766047B18A3AA7F9 /* SpeechManager.swift */; };
 
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
-		A69A1DDA97F44B3BA711A158 /* GapScheduleApp.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = GapScheduleApp.swift; sourceTree = "<group>"; };
-		8CAAEE2E8A14481DA64E0D1F /* ContentView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ContentView.swift; sourceTree = "<group>"; };
-		25C9210ED2754EDFB4B93F10 /* TaskData.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TaskData.swift; sourceTree = "<group>"; };
-		7AFD6C9B99D84A73919F17F5 /* CalendarGridView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CalendarGridView.swift; sourceTree = "<group>"; };
-		AE1A26092EFF4D60A7C0DB7C /* TaskRowView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TaskRowView.swift; sourceTree = "<group>"; };
-		3FE340A819B3421B8EE68FD7 /* ReminderPopupView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ReminderPopupView.swift; sourceTree = "<group>"; };
-		28DFA24209BE471B8A1D42D0 /* NotificationManager.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = NotificationManager.swift; sourceTree = "<group>"; };
-		5AE6B212CCE74AB8913C895A /* ScheduleManager.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ScheduleManager.swift; sourceTree = "<group>"; };
-		06408C1270F0455993635A72 /* SpeechManager.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SpeechManager.swift; sourceTree = "<group>"; };
-		646241DCBF754E6DA211BD59 /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
-		A753185BCCE64BE99E40EF3F /* GapSchedule.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = GapSchedule.app; sourceTree = BUILT_PRODUCTS_DIR; };
+		645AF5A7CA54491CA02F06B0 /* GapScheduleApp.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = GapScheduleApp.swift; sourceTree = "<group>"; };
+		8F12186E042C40D9ABD0CE56 /* ContentView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ContentView.swift; sourceTree = "<group>"; };
+		C1A90EDC466E4153AEC703D4 /* TaskData.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TaskData.swift; sourceTree = "<group>"; };
+		EC4D0AA49DC44FE69014E7D4 /* CalendarGridView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CalendarGridView.swift; sourceTree = "<group>"; };
+		57EA7F86E7ED4D9DBF4F2730 /* TaskRowView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TaskRowView.swift; sourceTree = "<group>"; };
+		2182CEADF0CF443EA8D0E3C5 /* ReminderPopupView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ReminderPopupView.swift; sourceTree = "<group>"; };
+		A3F27976B536426A91A393C1 /* NotificationManager.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = NotificationManager.swift; sourceTree = "<group>"; };
+		30C5AFC3D7AF41C3B801AE63 /* ScheduleManager.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ScheduleManager.swift; sourceTree = "<group>"; };
+		38DED031766047B18A3AA7F9 /* SpeechManager.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SpeechManager.swift; sourceTree = "<group>"; };
+		578B2A1D12A948D0977B2F9D /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
+		18565D717C2A457E8F7C2732 /* GapSchedule.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = GapSchedule.app; sourceTree = BUILT_PRODUCTS_DIR; };
 
 /* End PBXFileReference section */
 
 /* Begin PBXGroup section */
-		D323825D863247D48F725DC7 = {
+		B545DAEBFF834532816D96FC = {
 			isa = PBXGroup;
 			children = (
-				B9858F769EAD467DA4B0548E /* GapSchedule */,
-				54C9C933130C470B9A464406 /* Products */,
+				3D384ECBFA1D4B5D9328A247 /* GapSchedule */,
+				F6AF723D5461414E86E1FCF4 /* Products */,
 			);
 			sourceTree = "<group>";
 		};
-		B9858F769EAD467DA4B0548E = {
+		3D384ECBFA1D4B5D9328A247 = {
 			isa = PBXGroup;
 			children = (
-				A69A1DDA97F44B3BA711A158 /* GapScheduleApp.swift */,
-				8CAAEE2E8A14481DA64E0D1F /* ContentView.swift */,
-				47B5B400AC554C2D97327647 /* Models */,
-				DBEAAEEFB28B4AC6A3D04CF1 /* Views */,
-				20CF056C695B493A931E422F /* Managers */,
-				646241DCBF754E6DA211BD59 /* Info.plist */,
+				645AF5A7CA54491CA02F06B0 /* GapScheduleApp.swift */,
+				8F12186E042C40D9ABD0CE56 /* ContentView.swift */,
+				C164814A11FB438D99202A77 /* Models */,
+				EC1F572DCCA94048B027A1BF /* Views */,
+				655F2F34F7744654B481F3EC /* Managers */,
+				578B2A1D12A948D0977B2F9D /* Info.plist */,
 			);
 			path = GapSchedule;
 			sourceTree = "<group>";
 		};
-		47B5B400AC554C2D97327647 = {
+		C164814A11FB438D99202A77 = {
 			isa = PBXGroup;
 			children = (
-				25C9210ED2754EDFB4B93F10 /* TaskData.swift */,
+				C1A90EDC466E4153AEC703D4 /* TaskData.swift */,
 			);
 			path = Models;
 			sourceTree = "<group>";
 		};
-		DBEAAEEFB28B4AC6A3D04CF1 = {
+		EC1F572DCCA94048B027A1BF = {
 			isa = PBXGroup;
 			children = (
-				7AFD6C9B99D84A73919F17F5 /* CalendarGridView.swift */,
-				AE1A26092EFF4D60A7C0DB7C /* TaskRowView.swift */,
-				3FE340A819B3421B8EE68FD7 /* ReminderPopupView.swift */,
+				EC4D0AA49DC44FE69014E7D4 /* CalendarGridView.swift */,
+				57EA7F86E7ED4D9DBF4F2730 /* TaskRowView.swift */,
+				2182CEADF0CF443EA8D0E3C5 /* ReminderPopupView.swift */,
 			);
 			path = Views;
 			sourceTree = "<group>";
 		};
-		20CF056C695B493A931E422F = {
+		655F2F34F7744654B481F3EC = {
 			isa = PBXGroup;
 			children = (
-				28DFA24209BE471B8A1D42D0 /* NotificationManager.swift */,
-				5AE6B212CCE74AB8913C895A /* ScheduleManager.swift */,
-				06408C1270F0455993635A72 /* SpeechManager.swift */,
+				A3F27976B536426A91A393C1 /* NotificationManager.swift */,
+				30C5AFC3D7AF41C3B801AE63 /* ScheduleManager.swift */,
+				38DED031766047B18A3AA7F9 /* SpeechManager.swift */,
 			);
 			path = Managers;
 			sourceTree = "<group>";
 		};
-		54C9C933130C470B9A464406 = {
+		F6AF723D5461414E86E1FCF4 = {
 			isa = PBXGroup;
 			children = (
-				A753185BCCE64BE99E40EF3F /* GapSchedule.app */,
+				18565D717C2A457E8F7C2732 /* GapSchedule.app */,
 			);
 			name = Products;
 			sourceTree = "<group>";
@@ -97,58 +96,57 @@
 /* End PBXGroup section */
 
 /* Begin PBXNativeTarget section */
-		35F5606425A7432FBE86C1E3 /* GapSchedule */ = {
+		6717394D4D674BE197FC0BAE /* GapSchedule */ = {
 			isa = PBXNativeTarget;
-			buildConfigurationList = 35ECAA0B2C864A45AE18E289 /* Build configuration list */;
+			buildConfigurationList = 3CA5624F1C654AEC944E71DB /* Build configuration list */;
 			buildPhases = (
-				EB216A605EF74303B7086A13 /* Sources */,
-				D384AC6AD767444894A41CE1 /* Resources */,
+				EFB4329650724A68A5AE6E10 /* Sources */,
+				F94AA650DC32486DAFB4D16C /* Resources */,
 			);
 			buildRules = ();
 			dependencies = ();
 			name = GapSchedule;
 			productName = GapSchedule;
-			productReference = A753185BCCE64BE99E40EF3F /* GapSchedule.app */;
+			productReference = 18565D717C2A457E8F7C2732 /* GapSchedule.app */;
 			productType = "com.apple.product-type.application";
 		};
 
 /* End PBXNativeTarget section */
 
 /* Begin PBXProject section */
-		27B37DB918D04B46A45B86C2 /* Project object */ = {
+		1E540389CE914D258093AA7A /* Project object */ = {
 			isa = PBXProject;
 			attributes = {
 				BuildIndependentTargetsInParallel = 1;
 				LastSwiftUpdateCheck = 1540;
 				LastUpgradeCheck = 1540;
 				TargetAttributes = {
-					35F5606425A7432FBE86C1E3 = {
+					6717394D4D674BE197FC0BAE = {
 						CreatedOnToolsVersion = 15.4;
 					};
 				};
 			};
-			buildConfigurationList = 9984C7842FC24391931242A8 /* Build configuration list */;
+			buildConfigurationList = CA8517298A01475B88D438F9 /* Build configuration list */;
 			compatibilityVersion = "Xcode 15.0";
 			developmentRegion = "zh-Hans";
 			hasScannedForEncodings = 0;
 			knownRegions = (en, "zh-Hans");
-			mainGroup = D323825D863247D48F725DC7;
-			productRefGroup = 54C9C933130C470B9A464406 /* Products */;
+			mainGroup = B545DAEBFF834532816D96FC;
+			productRefGroup = F6AF723D5461414E86E1FCF4 /* Products */;
 			projectDirPath = "";
 			projectRoot = "";
 			targets = (
-				35F5606425A7432FBE86C1E3 /* GapSchedule */,
+				6717394D4D674BE197FC0BAE /* GapSchedule */,
 			);
 		};
 
 /* End PBXProject section */
 
 /* Begin PBXResourcesBuildPhase section */
-		D384AC6AD767444894A41CE1 /* Resources */ = {
+		F94AA650DC32486DAFB4D16C /* Resources */ = {
 			isa = PBXResourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
-				F05988E26BA54D2D8A26AEE6 /* Info.plist in Resources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -156,19 +154,19 @@
 /* End PBXResourcesBuildPhase section */
 
 /* Begin PBXSourcesBuildPhase section */
-		EB216A605EF74303B7086A13 /* Sources */ = {
+		EFB4329650724A68A5AE6E10 /* Sources */ = {
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
-				6EE15F86CE9F4CA49F4AB43E /* GapScheduleApp.swift in Sources */,
-				2FA1B723347D41DFAE60C7DB /* ContentView.swift in Sources */,
-				2E2B134198CD49B4A92CB73F /* TaskData.swift in Sources */,
-				27A1FDEF32F3426C8386FF70 /* CalendarGridView.swift in Sources */,
-				4B54A4E1F0664D708D18A31B /* TaskRowView.swift in Sources */,
-				66D9F31B7E2145DCB080465D /* ReminderPopupView.swift in Sources */,
-				7834ADD35DBE495CB9186FB0 /* NotificationManager.swift in Sources */,
-				3658A5474C124FD8B8FA5450 /* ScheduleManager.swift in Sources */,
-				448417F67EE448B7A27F2890 /* SpeechManager.swift in Sources */,
+				A683367B4A56474C948C2A2A /* GapScheduleApp.swift in Sources */,
+				1DA7A53CC7764DED8144F218 /* ContentView.swift in Sources */,
+				E4DCFAFA1FC74B669A996AEB /* TaskData.swift in Sources */,
+				68C39E4534334AC4A307370A /* CalendarGridView.swift in Sources */,
+				2326B7BEDBB849F08252FBF4 /* TaskRowView.swift in Sources */,
+				2571BB8352E94D54BCDFA049 /* ReminderPopupView.swift in Sources */,
+				D3BE7868193E4A72A4780201 /* NotificationManager.swift in Sources */,
+				55761E92C9874EB684B8DD7F /* ScheduleManager.swift in Sources */,
+				8B821ECCE388476E9E068105 /* SpeechManager.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -176,7 +174,7 @@
 /* End PBXSourcesBuildPhase section */
 
 /* Begin XCBuildConfiguration section */
-		C9D0984770204294A7C6DEA0 /* Debug */ = {
+		B6412390542944F2B6E93DF1 /* Debug */ = {
 			isa = XCBuildConfiguration;
 			buildSettings = {
 				ALWAYS_SEARCH_USER_PATHS = NO;
@@ -187,7 +185,7 @@
 			};
 			name = Debug;
 		};
-		A4D49B62850B46AA94C5D520 /* Release */ = {
+		5A03160233A5401786F09B63 /* Release */ = {
 			isa = XCBuildConfiguration;
 			buildSettings = {
 				ALWAYS_SEARCH_USER_PATHS = NO;
@@ -198,7 +196,7 @@
 			};
 			name = Release;
 		};
-		5FACA2DEF59948C496A354E1 /* Debug */ = {
+		5B60EE595E274D539CB4DC95 /* Debug */ = {
 			isa = XCBuildConfiguration;
 			buildSettings = {
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
@@ -219,7 +217,7 @@
 			};
 			name = Debug;
 		};
-		B27397A8BBA24950B45EAD47 /* Release */ = {
+		6F52F373C8F8412DAD7D9F97 /* Release */ = {
 			isa = XCBuildConfiguration;
 			buildSettings = {
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
@@ -244,20 +242,20 @@
 /* End XCBuildConfiguration section */
 
 /* Begin XCConfigurationList section */
-		9984C7842FC24391931242A8 = {
+		CA8517298A01475B88D438F9 = {
 			isa = XCConfigurationList;
-			buildConfigurations = (C9D0984770204294A7C6DEA0, A4D49B62850B46AA94C5D520);
+			buildConfigurations = (B6412390542944F2B6E93DF1, 5A03160233A5401786F09B63);
 			defaultConfigurationIsVisible = 0;
 			defaultConfigurationName = Release;
 		};
-		35ECAA0B2C864A45AE18E289 = {
+		3CA5624F1C654AEC944E71DB = {
 			isa = XCConfigurationList;
-			buildConfigurations = (5FACA2DEF59948C496A354E1, B27397A8BBA24950B45EAD47);
+			buildConfigurations = (5B60EE595E274D539CB4DC95, 6F52F373C8F8412DAD7D9F97);
 			defaultConfigurationIsVisible = 0;
 			defaultConfigurationName = Release;
 		};
 
 /* End XCConfigurationList section */
 	};
-	rootObject = 27B37DB918D04B46A45B86C2 /* Project object */;
+	rootObject = 1E540389CE914D258093AA7A /* Project object */;
 }

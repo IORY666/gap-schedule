@@ -62,7 +62,6 @@ content = f"""// !$*UTF8*$!
 for f in SWIFT_FILES:
     content += f"\t\t{build_files[f]} /* {os.path.basename(f)} in Sources */ = {{isa = PBXBuildFile; fileRef = {file_refs[f]} /* {os.path.basename(f)} */; }};\n"
 
-content += f"""\t\t{info_bf} /* Info.plist in Resources */ = {{isa = PBXBuildFile; fileRef = {info_fr} /* Info.plist */; }};\n"""
 
 content += """
 /* End PBXBuildFile section */
@@ -206,7 +205,6 @@ content += f"""\t\t{BR} /* Resources */ = {{
 \t\t\tisa = PBXResourcesBuildPhase;
 \t\t\tbuildActionMask = 2147483647;
 \t\t\tfiles = (
-\t\t\t\t{info_bf} /* Info.plist in Resources */,
 \t\t\t);
 \t\t\trunOnlyForDeploymentPostprocessing = 0;
 \t\t}};
