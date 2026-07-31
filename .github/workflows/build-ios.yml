@@ -7,11 +7,19 @@ on:
 
 jobs:
   build:
-    runs-on: macos-15      # Xcode 16, 兼容最新项目格式
+    runs-on: macos-14      # Apple Silicon
 
     steps:
       - name: Checkout 代码
         uses: actions/checkout@v4
+
+      - name: 选择 Xcode 16
+        run: |
+          ls /Applications/ | grep Xcode
+          sudo xcode-select -s /Applications/Xcode_16.app/Contents/Developer 2>/dev/null || \
+          sudo xcode-select -s /Applications/Xcode_16.2.app/Contents/Developer 2>/dev/null || \
+          echo "Using default Xcode"
+          xcodebuild -version
 
       - name: 安装 xcodegen
         run: brew install xcodegen
@@ -32,7 +40,7 @@ jobs:
             CODE_SIGN_IDENTITY="" \
             CODE_SIGNING_REQUIRED=NO \
             CODE_SIGNING_ALLOWED=NO \
-            -allowProvisioningUpdates 2>&1 | tail -20
+            -allowProvisioningUpdates 2>&1 | tail -30
 
       - name: 打包 IPA
         working-directory: iOS
