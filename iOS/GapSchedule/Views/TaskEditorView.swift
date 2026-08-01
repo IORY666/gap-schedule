@@ -77,6 +77,9 @@ struct EditableTask {
     var name: String
     var detail: String
 
+    init(emoji: String, time: String, name: String, detail: String) {
+        self.emoji = emoji; self.time = time; self.name = name; self.detail = detail
+    }
     init(from t: TaskItem) {
         emoji = t.emoji; time = t.timeRange; name = t.name; detail = t.detail
     }
