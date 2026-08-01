@@ -3,46 +3,29 @@ import SwiftUI
 struct ContentView: View {
     @StateObject private var manager = ScheduleManager.shared
     @State private var selectedDate = Date()
-    @State private var showReminder: (TaskItem, Bool)? = nil
+    @State private var showReminder: (TaskItem, Bool)? = nil  // (task, isOnTime)
     @State private var currentMinute = 0
-    @State private var showEditor = false
-    @State private var showDashboard = false
-    @State private var tasks: [TaskItem] = TaskStore.shared.load()
 
     private let timer = Timer.publish(every: 30, on: .main, in: .common).autoconnect()
 
     var body: some View {
         ZStack {
-            // 主界面：顶部固定 + 中间滚动 + 底部固定
+            // 主界面
             VStack(spacing: 0) {
-                // === 固定顶部 ===
                 headerView
                 Divider().background(Color.white.opacity(0.1))
-
-                dateBadgeView
-                    .padding(.horizontal, 16)
-
+                dateBadgeView.padding(.horizontal, 16)
                 Divider().background(Color.white.opacity(0.1))
-
                 CalendarGridView(selectedDate: $selectedDate)
-                    .padding(.horizontal, 12)
-                    .padding(.vertical, 6)
-
+                    .padding(.horizontal, 12).padding(.vertical, 6)
                 Divider().background(Color.white.opacity(0.1))
 
-                // === 仅任务列表可滚动 ===
                 ScrollView {
-                    taskListView
-                        .padding(.horizontal, 16)
-                        .padding(.vertical, 8)
-                }
-                .frame(maxHeight: .infinity)
+                    taskListView.padding(.horizontal, 16).padding(.vertical, 8)
+                }.frame(maxHeight: .infinity)
 
-                // === 固定底部 ===
                 Divider().background(Color.white.opacity(0.1))
-                progressView
-                    .padding(.horizontal, 16)
-                    .padding(.vertical, 10)
+                progressView.padding(.horizontal, 16).padding(.vertical, 10)
             }
             .background(Color(hex: "1a1b1e").ignoresSafeArea())
 
@@ -60,20 +43,7 @@ struct ContentView: View {
         .onReceive(timer) { _ in
             checkAlerts()
         }
-        .onReceive(NotificationCenter.default.publisher(for: .tasksDidChange)) { notif in
-            if let newTasks = notif.object as? [TaskItem] {
-                tasks = newTasks
-                manager.refresh()
-            }
-        }
-        .sheet(isPresented: $showEditor) {
-            TaskEditorView()
-        }
-        .sheet(isPresented: $showDashboard) {
-            DashboardView()
-        }
         .onAppear {
-            tasks = TaskStore.shared.load()
             NotificationManager.shared.requestAuth()
             NotificationManager.shared.registerCategories()
             NotificationManager.shared.scheduleAllIfNeeded()
@@ -89,14 +59,6 @@ struct ContentView: View {
                 .font(.system(size: 18, weight: .bold))
                 .foregroundColor(.white)
             Spacer()
-            Button(action: { showDashboard = true }) {
-                Text("📊")
-                    .font(.system(size: 16))
-            }
-            Button(action: { showEditor = true }) {
-                Text("📝")
-                    .font(.system(size: 16))
-            }
             Text(Date(), style: .time)
                 .font(.system(size: 13))
                 .foregroundColor(Color.white.opacity(0.4))
@@ -135,7 +97,7 @@ struct ContentView: View {
 
     private var taskListView: some View {
         VStack(spacing: 4) {
-            ForEach(tasks) { task in
+            ForEach(allTasks) { task in
                 let isCur = task.id == manager.currentTaskId
                 TaskRowView(task: task, isCurrent: isCur)
                     .environmentObject(manager)
@@ -145,7 +107,7 @@ struct ContentView: View {
 
     private var progressView: some View {
         HStack {
-            Text("今日进度 \(manager.dayProgress.checked.count)/\(tasks.count)")
+            Text("今日进度 \(manager.dayProgress.checked.count)/\(allTasks.count)")
                 .font(.system(size: 11))
                 .foregroundColor(Color.white.opacity(0.4))
             Spacer()
@@ -157,7 +119,7 @@ struct ContentView: View {
                         .cornerRadius(2.5)
                     Rectangle()
                         .fill(Color(hex: "f0a040"))
-                        .frame(width: geo.size.width * CGFloat(manager.dayProgress.checked.count) / CGFloat(max(1, tasks.count)), height: 5)
+                        .frame(width: geo.size.width * CGFloat(manager.dayProgress.checked.count) / CGFloat(allTasks.count), height: 5)
                         .cornerRadius(2.5)
                         .animation(.easeInOut(duration: 0.3), value: manager.dayProgress.checked.count)
                 }
