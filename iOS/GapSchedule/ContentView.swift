@@ -10,34 +10,36 @@ struct ContentView: View {
 
     var body: some View {
         ZStack {
-            // 主界面
-            ScrollView {
-                VStack(spacing: 0) {
-                    // 顶栏
-                    headerView
-                    Divider().background(Color.white.opacity(0.1))
+            // 主界面：顶部固定 + 中间滚动 + 底部固定
+            VStack(spacing: 0) {
+                // === 固定顶部 ===
+                headerView
+                Divider().background(Color.white.opacity(0.1))
 
-                    // 日期标签
-                    dateBadgeView
-                        .padding(.horizontal, 16)
+                dateBadgeView
+                    .padding(.horizontal, 16)
 
-                    Divider().background(Color.white.opacity(0.1))
+                Divider().background(Color.white.opacity(0.1))
 
-                    // 日历
-                    CalendarGridView(selectedDate: $selectedDate)
-                        .padding(.horizontal, 12)
-                        .padding(.vertical, 8)
+                CalendarGridView(selectedDate: $selectedDate)
+                    .padding(.horizontal, 12)
+                    .padding(.vertical, 6)
 
-                    // 任务列表
+                Divider().background(Color.white.opacity(0.1))
+
+                // === 仅任务列表可滚动 ===
+                ScrollView {
                     taskListView
                         .padding(.horizontal, 16)
                         .padding(.vertical, 8)
-
-                    // 进度条
-                    progressView
-                        .padding(.horizontal, 16)
-                        .padding(.bottom, 20)
                 }
+                .frame(maxHeight: .infinity)
+
+                // === 固定底部 ===
+                Divider().background(Color.white.opacity(0.1))
+                progressView
+                    .padding(.horizontal, 16)
+                    .padding(.vertical, 10)
             }
             .background(Color(hex: "1a1b1e").ignoresSafeArea())
 
