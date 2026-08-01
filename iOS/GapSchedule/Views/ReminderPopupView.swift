@@ -1,4 +1,5 @@
 import SwiftUI
+import Combine
 
 /// Snooze 提醒弹窗
 struct ReminderPopupView: View {
@@ -9,11 +10,13 @@ struct ReminderPopupView: View {
 
     @State private var remainSeconds = 15
     @State private var borderGlow = false
-    @State private var countdownTimer: Timer?
+
+    /// Combine 倒计时（每1秒触发）
+    private let countdown = Timer.publish(every: 1, on: .main, in: .common).autoconnect()
 
     var body: some View {
         VStack(spacing: 0) {
-            Text(isOnTime ? "⏰ 时间到！开始吧" : "⏰ 还有\(max(0, remainMin))分钟开始")
+            Text(isOnTime ? "⏰ 时间到！" : "⏰ 还有\(max(0, remainMin))分钟")
                 .font(.system(size: 15, weight: .bold))
                 .foregroundColor(Color(hex: "f0a040"))
                 .padding(.bottom, 10)
@@ -33,7 +36,7 @@ struct ReminderPopupView: View {
                 .padding(.bottom, 16)
 
             if isOnTime {
-                Button(action: { cleanupAndDismiss() }) {
+                Button(action: { onDismiss() }) {
                     Text("✓ 知道了")
                         .font(.system(size: 15, weight: .bold))
                         .foregroundColor(.black)
@@ -45,20 +48,19 @@ struct ReminderPopupView: View {
                 HStack(spacing: 8) {
                     snoozeBtn("离开", Color.white.opacity(0.4)) {
                         manager.dismiss(task.id)
-                        cleanupAndDismiss()
+                        onDismiss()
                     }
                     snoozeBtn("5分钟后", Color(hex: "74c0fc")) {
                         manager.snooze(taskId: task.id, minutes: 5)
-                        cleanupAndDismiss()
+                        onDismiss()
                     }
                     snoozeBtn("1分钟后", Color(hex: "f0a040")) {
                         manager.snooze(taskId: task.id, minutes: 1)
-                        cleanupAndDismiss()
+                        onDismiss()
                     }
                     snoozeBtn("到点", Color(hex: "57d97c")) {
-                        let m = max(1, remainMin)
-                        manager.snooze(taskId: task.id, minutes: m)
-                        cleanupAndDismiss()
+                        manager.snooze(taskId: task.id, minutes: max(1, remainMin))
+                        onDismiss()
                     }
                 }
             }
@@ -84,24 +86,21 @@ struct ReminderPopupView: View {
         .shadow(color: .black.opacity(0.5), radius: 30)
         .onAppear {
             borderGlow = true
-            startCountdown()
-            // 语音播报 — 延迟0.3秒确保AudioSession已激活
+            // 语音播报
             DispatchQueue.main.asyncAfter(deadline: .now() + 0.3) {
-                let mode: ReminderMode = isOnTime ? .onTime : .tenMin
-                let text: String = {
-                    switch mode {
-                    case .tenMin:  return task.pre10Speech
-                    case .fiveMin: return task.pre5Speech
-                    case .onTime:  return task.nowSpeech
-                    }
-                }()
+                let text = isOnTime ? task.nowSpeech : task.pre10Speech
                 SpeechManager.shared.speak(text)
             }
         }
-        .onDisappear {
-            SpeechManager.shared.stop()
-            countdownTimer?.invalidate()
-            countdownTimer = nil
+        .onDisappear { SpeechManager.shared.stop() }
+        .onReceive(countdown) { _ in
+            guard !isOnTime else { return }
+            if remainSeconds > 0 {
+                remainSeconds -= 1
+            } else {
+                manager.snooze(taskId: task.id, minutes: 5)
+                onDismiss()
+            }
         }
     }
 
@@ -109,28 +108,6 @@ struct ReminderPopupView: View {
         let now = Calendar.current.component(.hour, from: Date()) * 60
                 + Calendar.current.component(.minute, from: Date())
         return max(0, task.startMinutes - now)
-    }
-
-    private func startCountdown() {
-        countdownTimer?.invalidate()
-        countdownTimer = Timer.scheduledTimer(withTimeInterval: 1, repeats: true) { [weak self] t in
-            guard let self else { t.invalidate(); return }
-            if remainSeconds > 0 {
-                remainSeconds -= 1
-            } else {
-                t.invalidate()
-                countdownTimer = nil
-                manager.snooze(taskId: task.id, minutes: 5)
-                onDismiss()
-            }
-        }
-    }
-
-    private func cleanupAndDismiss() {
-        countdownTimer?.invalidate()
-        countdownTimer = nil
-        SpeechManager.shared.stop()
-        onDismiss()
     }
 
     private func snoozeBtn(_ title: String, _ color: Color, action: @escaping () -> Void) -> some View {
