@@ -82,7 +82,8 @@ let allTasks: [TaskItem] = [
 let weekdays = ["周日","周一","周二","周三","周四","周五","周六"]
 
 func isSaturday(_ date: Date = Date()) -> Bool {
-    Calendar.current.component(.weekday, from: date) == 7
+    // return Calendar.current.component(.weekday, from: date) == 7  // 正式版
+    return false  // 测试模式：每天都是训练日
 }
 
 func todayKey() -> String {

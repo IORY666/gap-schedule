@@ -71,7 +71,8 @@ def save_checks(data):
 def today_str():
     d = date.today(); return f"{d.year}-{d.month}-{d.day}"
 def is_rest_day():
-    return date.today().weekday() == 5
+    # return date.today().weekday() == 5  # 正式：周六休息
+    return False  # 测试模式：每天都是训练日
 def open_html():
     import webbrowser
     webbrowser.open(f"file:///{os.path.join(BASE_DIR, 'gap-schedule.html').replace(os.sep, '/')}")
