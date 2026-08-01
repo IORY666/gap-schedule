@@ -53,6 +53,11 @@ final class ScheduleManager: ObservableObject {
 
     // MARK: - 当前任务
 
+    func refresh() {
+        updateCurrentTask()
+        NotificationManager.shared.refreshAll()
+    }
+
     func updateCurrentTask() {
         isRestDay = isSaturday()
 
@@ -65,7 +70,7 @@ final class ScheduleManager: ObservableObject {
                 + Calendar.current.component(.minute, from: Date())
 
         // 已完成/离开的任务不算当前任务
-        let active = allTasks.filter { t in
+        let active = currentTasks.filter { t in
             !dayProgress.checked.contains(t.id) && !dayProgress.dismissed.contains(t.id)
         }
 
@@ -77,7 +82,7 @@ final class ScheduleManager: ObservableObject {
         // Bool = isOnTime (到点 vs 预告)
         var result: [(TaskItem, Bool)] = []
 
-        for task in allTasks {
+        for task in currentTasks {
             guard !dayProgress.checked.contains(task.id),
                   !dayProgress.dismissed.contains(task.id) else { continue }
 
