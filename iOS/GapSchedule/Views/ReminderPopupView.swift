@@ -1,43 +1,39 @@
 import SwiftUI
 
-/// Snooze 提醒弹窗（完整复刻桌面版）
+/// Snooze 提醒弹窗
 struct ReminderPopupView: View {
     let task: TaskItem
-    let isOnTime: Bool       // true=到点, false=预告
+    let isOnTime: Bool
+    let onDismiss: () -> Void           // 替代 @Environment(\.dismiss)
     @EnvironmentObject var manager: ScheduleManager
-    @Environment(\.dismiss) private var dismiss
 
     @State private var remainSeconds = 15
     @State private var borderGlow = false
+    @State private var countdownTimer: Timer?
 
     var body: some View {
         VStack(spacing: 0) {
-            // 标题
-            Text(isOnTime ? "⏰ 时间到！开始吧" : "⏰ 还有\(remainMin)分钟开始")
+            Text(isOnTime ? "⏰ 时间到！开始吧" : "⏰ 还有\(max(0, remainMin))分钟开始")
                 .font(.system(size: 15, weight: .bold))
                 .foregroundColor(Color(hex: "f0a040"))
                 .padding(.bottom, 10)
 
-            // Emoji
             Text(task.emoji)
                 .font(.system(size: 50))
                 .padding(.bottom, 4)
 
-            // 任务名
             Text(task.name)
                 .font(.system(size: 18, weight: .bold))
                 .foregroundColor(.white)
                 .padding(.bottom, 2)
 
-            // 时间
             Text(task.timeRange)
                 .font(.system(size: 13))
                 .foregroundColor(Color.white.opacity(0.5))
                 .padding(.bottom, 16)
 
             if isOnTime {
-                // 到点弹窗：只有一个按钮
-                Button(action: { dismiss() }) {
+                Button(action: { cleanupAndDismiss() }) {
                     Text("✓ 知道了")
                         .font(.system(size: 15, weight: .bold))
                         .foregroundColor(.black)
@@ -46,28 +42,27 @@ struct ReminderPopupView: View {
                         .cornerRadius(20)
                 }
             } else {
-                // Snooze弹窗：四个按钮
                 HStack(spacing: 8) {
-                    snoozeButton("离开", color: Color.white.opacity(0.4)) {
+                    snoozeBtn("离开", Color.white.opacity(0.4)) {
                         manager.dismiss(task.id)
-                        dismiss()
+                        cleanupAndDismiss()
                     }
-                    snoozeButton("5分钟后", color: Color(hex: "74c0fc")) {
+                    snoozeBtn("5分钟后", Color(hex: "74c0fc")) {
                         manager.snooze(taskId: task.id, minutes: 5)
-                        dismiss()
+                        cleanupAndDismiss()
                     }
-                    snoozeButton("1分钟后", color: Color(hex: "f0a040")) {
+                    snoozeBtn("1分钟后", Color(hex: "f0a040")) {
                         manager.snooze(taskId: task.id, minutes: 1)
-                        dismiss()
+                        cleanupAndDismiss()
                     }
-                    snoozeButton("到点", color: Color(hex: "57d97c")) {
-                        manager.snooze(taskId: task.id, minutes: max(1, remainMin))
-                        dismiss()
+                    snoozeBtn("到点", Color(hex: "57d97c")) {
+                        let m = max(1, remainMin)
+                        manager.snooze(taskId: task.id, minutes: m)
+                        cleanupAndDismiss()
                     }
                 }
             }
 
-            // 倒计时条
             if !isOnTime {
                 ProgressView(value: Double(remainSeconds), total: 15)
                     .tint(Color(hex: "f0a040"))
@@ -90,31 +85,55 @@ struct ReminderPopupView: View {
         .onAppear {
             borderGlow = true
             startCountdown()
-            // 语音播报
-            let mode: ReminderMode = isOnTime ? .onTime : .tenMin
-            SpeechManager.shared.speakReminder(taskId: task.id, mode: mode)
+            // 语音播报 — 延迟0.3秒确保AudioSession已激活
+            DispatchQueue.main.asyncAfter(deadline: .now() + 0.3) {
+                let mode: ReminderMode = isOnTime ? .onTime : .tenMin
+                let text: String = {
+                    switch mode {
+                    case .tenMin:  return task.pre10Speech
+                    case .fiveMin: return task.pre5Speech
+                    case .onTime:  return task.nowSpeech
+                    }
+                }()
+                SpeechManager.shared.speak(text)
+            }
         }
-        .onDisappear { SpeechManager.shared.stop() }
+        .onDisappear {
+            SpeechManager.shared.stop()
+            countdownTimer?.invalidate()
+            countdownTimer = nil
+        }
     }
 
     private var remainMin: Int {
-        task.startMinutes - (Calendar.current.component(.hour, from: Date()) * 60
-                           + Calendar.current.component(.minute, from: Date()))
+        let now = Calendar.current.component(.hour, from: Date()) * 60
+                + Calendar.current.component(.minute, from: Date())
+        return max(0, task.startMinutes - now)
     }
 
     private func startCountdown() {
-        Timer.scheduledTimer(withTimeInterval: 1, repeats: true) { t in
+        countdownTimer?.invalidate()
+        countdownTimer = Timer.scheduledTimer(withTimeInterval: 1, repeats: true) { [weak self] t in
+            guard let self else { t.invalidate(); return }
             if remainSeconds > 0 {
                 remainSeconds -= 1
             } else {
                 t.invalidate()
+                countdownTimer = nil
                 manager.snooze(taskId: task.id, minutes: 5)
-                dismiss()
+                onDismiss()
             }
         }
     }
 
-    private func snoozeButton(_ title: String, color: Color, action: @escaping () -> Void) -> some View {
+    private func cleanupAndDismiss() {
+        countdownTimer?.invalidate()
+        countdownTimer = nil
+        SpeechManager.shared.stop()
+        onDismiss()
+    }
+
+    private func snoozeBtn(_ title: String, _ color: Color, action: @escaping () -> Void) -> some View {
         Button(action: action) {
             Text(title)
                 .font(.system(size: 12, weight: .bold))
@@ -128,7 +147,7 @@ struct ReminderPopupView: View {
     }
 }
 
-// MARK: - Hex Color
+// MARK: - Hex Color Helper
 
 extension Color {
     init(hex: String) {

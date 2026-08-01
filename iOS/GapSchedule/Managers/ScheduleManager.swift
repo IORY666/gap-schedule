@@ -130,7 +130,8 @@ final class ScheduleManager: ObservableObject {
             dayProgress = DayProgress()
             snoozedTasks = [:]
             saveProgress()
-            NotificationManager.shared.scheduleAllIfNeeded()
+            // 跨天刷新通知
+            NotificationManager.shared.refreshAll()
         }
     }
 

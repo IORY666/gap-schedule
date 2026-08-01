@@ -45,12 +45,11 @@ struct ContentView: View {
             if let (task, isOnTime) = showReminder {
                 Color.black.opacity(0.6)
                     .ignoresSafeArea()
-                    .onTapGesture { /* block */ }
 
-                ReminderPopupView(task: task, isOnTime: isOnTime)
+                ReminderPopupView(task: task, isOnTime: isOnTime,
+                                  onDismiss: { showReminder = nil })
                     .environmentObject(manager)
                     .frame(maxWidth: 320)
-                    .onDisappear { showReminder = nil }
             }
         }
         .onReceive(timer) { _ in
