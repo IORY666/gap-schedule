@@ -23,9 +23,6 @@ SWIFT_FILES = [
 P = uid()  # Project
 MG = uid() # Main group
 SG = uid() # GapSchedule group
-MG2 = uid() # Models group
-VG = uid() # Views group
-MGG = uid() # Managers group
 NT = uid() # Native target
 BP = uid() # Build phase - sources
 BR = uid() # Build phase - resources
@@ -39,15 +36,21 @@ CB4 = uid() # Config - target release
 
 file_refs = {}
 build_files = {}
-
 for f in SWIFT_FILES:
     fr = uid(); bf = uid()
     file_refs[f] = fr; build_files[f] = bf
 
-# Info.plist
-info_fr = uid(); info_bf = uid()
+# Group files by parent directory
+from collections import defaultdict
+groups = defaultdict(list)
+for f in SWIFT_FILES:
+    parent = os.path.dirname(f).replace("GapSchedule/", "").replace("GapSchedule", "")
+    if parent == "" or parent == "GapSchedule":
+        parent = "_root"
+    groups[parent].append(f)
 
-# Products group
+group_uuids = {g: uid() for g in groups}
+info_fr = uid(); info_bf = uid()
 PROD = uid()
 
 content = f"""// !$*UTF8*$!
@@ -84,6 +87,7 @@ content += """
 /* Begin PBXGroup section */
 """
 
+# Main group
 content += f"""\t\t{MG} = {{
 \t\t\tisa = PBXGroup;
 \t\t\tchildren = (
@@ -92,48 +96,42 @@ content += f"""\t\t{MG} = {{
 \t\t\t);
 \t\t\tsourceTree = \"<group>\";
 \t\t}};
-\t\t{SG} = {{
+"""
+
+# GapSchedule group with children (root files + subgroup refs)
+root_files = groups.get("_root", [])
+children_refs = "".join(f"\t\t\t\t{file_refs[f]} /* {os.path.basename(f)} */,\n" for f in root_files)
+child_groups = ""
+for gname, gid in sorted(group_uuids.items()):
+    if gname != "_root":
+        child_groups += f"\t\t\t\t{gid} /* {gname} */,\n"
+content += f"""\t\t{SG} = {{
 \t\t\tisa = PBXGroup;
 \t\t\tchildren = (
-\t\t\t\t{file_refs[SWIFT_FILES[0]]} /* GapScheduleApp.swift */,
-\t\t\t\t{file_refs[SWIFT_FILES[1]]} /* ContentView.swift */,
-\t\t\t\t{MG2} /* Models */,
-\t\t\t\t{VG} /* Views */,
-\t\t\t\t{MGG} /* Managers */,
-\t\t\t\t{info_fr} /* Info.plist */,
+{children_refs}{child_groups}\t\t\t\t{info_fr} /* Info.plist */,
 \t\t\t);
 \t\t\tpath = GapSchedule;
 \t\t\tsourceTree = \"<group>\";
 \t\t}};
-\t\t{MG2} = {{
+"""
+
+# Subgroups
+for gname, gid in sorted(group_uuids.items()):
+    if gname == "_root":
+        continue
+    gfiles = groups[gname]
+    refs = "".join(f"\t\t\t\t{file_refs[f]} /* {os.path.basename(f)} */,\n" for f in gfiles)
+    content += f"""\t\t{gid} /* {gname} */ = {{
 \t\t\tisa = PBXGroup;
 \t\t\tchildren = (
-\t\t\t\t{file_refs[SWIFT_FILES[2]]} /* TaskData.swift */,
-\t\t\t);
-\t\t\tpath = Models;
+{refs}\t\t\t);
+\t\t\tpath = {gname};
 \t\t\tsourceTree = \"<group>\";
 \t\t}};
-\t\t{VG} = {{
-\t\t\tisa = PBXGroup;
-\t\t\tchildren = (
-\t\t\t\t{file_refs[SWIFT_FILES[3]]} /* CalendarGridView.swift */,
-\t\t\t\t{file_refs[SWIFT_FILES[4]]} /* TaskRowView.swift */,
-\t\t\t\t{file_refs[SWIFT_FILES[5]]} /* ReminderPopupView.swift */,
-\t\t\t);
-\t\t\tpath = Views;
-\t\t\tsourceTree = \"<group>\";
-\t\t}};
-\t\t{MGG} = {{
-\t\t\tisa = PBXGroup;
-\t\t\tchildren = (
-\t\t\t\t{file_refs[SWIFT_FILES[6]]} /* NotificationManager.swift */,
-\t\t\t\t{file_refs[SWIFT_FILES[7]]} /* ScheduleManager.swift */,
-\t\t\t\t{file_refs[SWIFT_FILES[8]]} /* SpeechManager.swift */,
-\t\t\t);
-\t\t\tpath = Managers;
-\t\t\tsourceTree = \"<group>\";
-\t\t}};
-\t\t{PROD} = {{
+"""
+
+# Products group
+content += f"""\t\t{PROD} = {{
 \t\t\tisa = PBXGroup;
 \t\t\tchildren = (
 \t\t\t\t{PR} /* GapSchedule.app */,
