@@ -64,20 +64,22 @@ final class ScheduleManager: ObservableObject {
         let now = Calendar.current.component(.hour, from: Date()) * 60
                 + Calendar.current.component(.minute, from: Date())
 
-        // 已完成/离开的任务不算当前任务
-        let active = allTasks.filter { t in
+        let active = currentTasks.filter { t in
             !dayProgress.checked.contains(t.id) && !dayProgress.dismissed.contains(t.id)
         }
 
         currentTaskId = active.first(where: { now >= $0.startMinutes && now < $0.endMinutes })?.id
     }
 
-    /// 需要弹snooze弹窗的任务（10分钟前 + snooze到期）
+    func refresh() {
+        updateCurrentTask()
+        NotificationManager.shared.refreshAll()
+    }
+
     func tasksNeedingAlert(nowMin: Int) -> [(TaskItem, Bool)] {
-        // Bool = isOnTime (到点 vs 预告)
         var result: [(TaskItem, Bool)] = []
 
-        for task in allTasks {
+        for task in currentTasks {
             guard !dayProgress.checked.contains(task.id),
                   !dayProgress.dismissed.contains(task.id) else { continue }
 

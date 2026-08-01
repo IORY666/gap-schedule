@@ -86,13 +86,13 @@ struct ReminderPopupView: View {
         .shadow(color: .black.opacity(0.5), radius: 30)
         .onAppear {
             borderGlow = true
-            // 语音播报
-            DispatchQueue.main.asyncAfter(deadline: .now() + 0.3) {
-                let text = isOnTime ? task.nowSpeech : task.pre10Speech
-                SpeechManager.shared.speak(text)
-            }
+            // 语音播报（延迟确保 AudioSession 就绪）
+            let text = isOnTime ? task.nowSpeech : task.pre10Speech
+            SpeechManager.shared.speak(text)
         }
-        .onDisappear { SpeechManager.shared.stop() }
+        .onDisappear {
+            SpeechManager.shared.stop()
+        }
         .onReceive(countdown) { _ in
             guard !isOnTime else { return }
             if remainSeconds > 0 {
