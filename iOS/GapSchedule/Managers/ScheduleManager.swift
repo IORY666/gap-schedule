@@ -8,7 +8,7 @@ final class ScheduleManager: ObservableObject {
     @Published var dayProgress = DayProgress()
     @Published var snoozedTasks: [Int: Int] = [:] // [taskId: nextAlertMinute]
     @Published var currentTaskId: Int? = nil
-    @Published var resting = false
+    @Published var isRestDay = false
 
     private var timer: Timer?
     private let storeKey = "gap_day_progress"
@@ -53,15 +53,10 @@ final class ScheduleManager: ObservableObject {
 
     // MARK: - 当前任务
 
-    func refresh() {
-        updateCurrentTask()
-        NotificationManager.shared.refreshAll()
-    }
-
     func updateCurrentTask() {
-        resting = isRestDay()
+        isRestDay = isSaturday()
 
-        if resting {
+        if isRestDay {
             currentTaskId = nil
             return
         }
@@ -70,7 +65,7 @@ final class ScheduleManager: ObservableObject {
                 + Calendar.current.component(.minute, from: Date())
 
         // 已完成/离开的任务不算当前任务
-        let active = TaskStore.shared.tasks.filter { t in
+        let active = allTasks.filter { t in
             !dayProgress.checked.contains(t.id) && !dayProgress.dismissed.contains(t.id)
         }
 
@@ -82,7 +77,7 @@ final class ScheduleManager: ObservableObject {
         // Bool = isOnTime (到点 vs 预告)
         var result: [(TaskItem, Bool)] = []
 
-        for task in TaskStore.shared.tasks {
+        for task in allTasks {
             guard !dayProgress.checked.contains(task.id),
                   !dayProgress.dismissed.contains(task.id) else { continue }
 

@@ -1,70 +1,71 @@
 import AVFoundation
 
-/// 语音播报：默认任务播 edge-tts Xiaoyi mp3，自定义任务用系统 TTS
+/// iOS 语音播报管理器
 final class SpeechManager: NSObject {
     static let shared = SpeechManager()
 
-    private let synth = AVSpeechSynthesizer()
-    private var player: AVAudioPlayer?
+    private let synthesizer = AVSpeechSynthesizer()
+    private var hasVoice = false
 
     private override init() {
         super.init()
-        synth.delegate = self
+        synthesizer.delegate = self
+
+        // 配置音频会话（允许后台播放 + 混音）
         do {
-            try AVAudioSession.sharedInstance().setCategory(.playback, mode: .spokenAudio, options: [.duckOthers])
+            try AVAudioSession.sharedInstance().setCategory(
+                .playback, mode: .default,
+                options: [.duckOthers, .mixWithOthers])
             try AVAudioSession.sharedInstance().setActive(true)
         } catch {
-            print("[Speech] AudioSession: \(error.localizedDescription)")
+            print("[Speech] AudioSession error: \(error)")
+        }
+
+        // 检查中文语音
+        if let voice = AVSpeechSynthesisVoice(language: "zh-CN") {
+            hasVoice = true
+            print("[Speech] Voice: \(voice.name) (\(voice.language))")
+        } else {
+            print("[Speech] WARNING: zh-CN voice not available, using default")
         }
     }
 
-    /// 播报任务语音（mp3 优先 → TTS 回退）
-    func speak(taskId: Int, mode: String) {
-        // mode: "pre" | "now"
-        // 尝试加载 bundle 中的 mp3
-        let filename = "\(taskId)_\(mode)"
-        if let url = Bundle.main.url(forResource: filename, withExtension: "mp3") {
-            playMP3(url: url)
+    /// 播报提醒文本（主线程调用）
+    func speak(_ text: String) {
+        guard hasVoice || AVSpeechSynthesisVoice(language: "zh-CN") != nil else {
+            print("[Speech] No Chinese voice, skip: \(text)")
             return
         }
 
-        // 回退到 TTS
-        guard let task = defaultTasks.first(where: { $0.id == taskId }) else { return }
-        let text = mode == "now" ? task.nowSpeech : task.pre5Speech
-        speakTTS(text)
-    }
+        // 停止当前播报
+        if synthesizer.isSpeaking {
+            synthesizer.stopSpeaking(at: .immediate)
+        }
 
-    /// 直接播报文本（自定义任务用）
-    func speakTTS(_ text: String) {
+        let utterance = AVSpeechUtterance(string: text)
+        utterance.voice = AVSpeechSynthesisVoice(language: "zh-CN")
+        utterance.rate = 0.48
+        utterance.pitchMultiplier = 1.05
+        utterance.volume = 0.9
+
         DispatchQueue.main.async { [weak self] in
-            guard let self else { return }
-            if self.synth.isSpeaking { self.synth.stopSpeaking(at: .word) }
-            let voice = AVSpeechSynthesisVoice(language: "zh-CN")
-                ?? AVSpeechSynthesisVoice(language: "zh-Hans-CN")
-                ?? AVSpeechSynthesisVoice()
-            let u = AVSpeechUtterance(string: text)
-            u.voice = voice; u.rate = 0.48; u.pitchMultiplier = 1.05; u.volume = 0.9
-            self.synth.speak(u)
+            self?.synthesizer.speak(utterance)
         }
     }
 
     func stop() {
         DispatchQueue.main.async { [weak self] in
-            self?.synth.stopSpeaking(at: .immediate)
-            self?.player?.stop()
-        }
-    }
-
-    private func playMP3(url: URL) {
-        DispatchQueue.main.async { [weak self] in
-            self?.player = try? AVAudioPlayer(contentsOf: url)
-            self?.player?.play()
+            self?.synthesizer.stopSpeaking(at: .immediate)
         }
     }
 }
 
 extension SpeechManager: AVSpeechSynthesizerDelegate {
     func speechSynthesizer(_ synthesizer: AVSpeechSynthesizer, didFinish utterance: AVSpeechUtterance) {
-        print("[Speech] TTS OK")
+        print("[Speech] Finished: \(utterance.speechString)")
+    }
+
+    func speechSynthesizer(_ synthesizer: AVSpeechSynthesizer, didCancel utterance: AVSpeechUtterance) {
+        print("[Speech] Cancelled")
     }
 }

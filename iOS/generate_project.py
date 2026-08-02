@@ -4,22 +4,13 @@ import uuid, os, sys
 def uid():
     return uuid.uuid4().hex[:24].upper()
 
-# MP3 语音资源（edge-tts Xiaoyi 神经网络语音）
-VOICE_DIR = "GapSchedule/voice"
-import glob as _glob
-RESOURCES = sorted([f.replace("\\", "/") for f in _glob.glob(f"{VOICE_DIR}/*.mp3")])
-
 SWIFT_FILES = [
     "GapSchedule/GapScheduleApp.swift",
-    "GapSchedule/MainTabView.swift",
     "GapSchedule/ContentView.swift",
     "GapSchedule/Models/TaskData.swift",
-    "GapSchedule/Models/TaskStore.swift",
     "GapSchedule/Views/CalendarGridView.swift",
+    "GapSchedule/Views/TaskRowView.swift",
     "GapSchedule/Views/ReminderPopupView.swift",
-    "GapSchedule/Views/TaskEditorView.swift",
-    "GapSchedule/Views/DashboardView.swift",
-    "GapSchedule/Views/SettingsView.swift",
     "GapSchedule/Managers/NotificationManager.swift",
     "GapSchedule/Managers/ScheduleManager.swift",
     "GapSchedule/Managers/SpeechManager.swift",
@@ -45,12 +36,6 @@ build_files = {}
 for f in SWIFT_FILES:
     fr = uid(); bf = uid()
     file_refs[f] = fr; build_files[f] = bf
-
-# Resource files (mp3 voice)
-res_refs = {}; res_builds = {}
-for r in RESOURCES:
-    rr = uid(); rb = uid()
-    res_refs[r] = rr; res_builds[r] = rb
 
 # Group files by parent directory
 from collections import defaultdict
@@ -79,9 +64,7 @@ content = f"""// !$*UTF8*$!
 # Build files
 for f in SWIFT_FILES:
     content += f"\t\t{build_files[f]} /* {os.path.basename(f)} in Sources */ = {{isa = PBXBuildFile; fileRef = {file_refs[f]} /* {os.path.basename(f)} */; }};\n"
-for r in RESOURCES:
-    bn = os.path.basename(r)
-    content += f"\t\t{res_builds[r]} /* {bn} in Resources */ = {{isa = PBXBuildFile; fileRef = {res_refs[r]} /* {bn} */; }};\n"
+
 
 content += """
 /* End PBXBuildFile section */
@@ -93,9 +76,6 @@ for f in SWIFT_FILES:
     content += f"\t\t{file_refs[f]} /* {os.path.basename(f)} */ = {{isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = {os.path.basename(f)}; sourceTree = \"<group>\"; }};\n"
 
 content += f"""\t\t{info_fr} /* Info.plist */ = {{isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = \"<group>\"; }};\n"""
-for r in RESOURCES:
-    bn = os.path.basename(r)
-    content += f"\t\t{res_refs[r]} /* {bn} */ = {{isa = PBXFileReference; lastKnownFileType = audio.mp3; path = {bn}; sourceTree = \"<group>\"; }};\n"
 content += f"""\t\t{PR} /* GapSchedule.app */ = {{isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = GapSchedule.app; sourceTree = BUILT_PRODUCTS_DIR; }};\n"""
 
 content += """
@@ -122,19 +102,6 @@ child_groups = ""
 for gname, gid in sorted(group_uuids.items()):
     if gname != "_root":
         child_groups += f"\t\t\t\t{gid} /* {gname} */,\n"
-# Voice group
-voice_gid = uid()
-voice_files_refs = "".join(f"\t\t\t\t{res_refs[r]} /* {os.path.basename(r)} */,\n" for r in RESOURCES)
-content += f"""\t\t{voice_gid} /* voice */ = {{
-\t\t\tisa = PBXGroup;
-\t\t\tchildren = (
-{voice_files_refs}\t\t\t);
-\t\t\tpath = voice;
-\t\t\tsourceTree = \"<group>\";
-\t\t}};
-"""
-child_groups += f"\t\t\t\t{voice_gid} /* voice */,\n"
-
 content += f"""\t\t{SG} = {{
 \t\t\tisa = PBXGroup;
 \t\t\tchildren = (
@@ -232,12 +199,11 @@ content += """
 /* Begin PBXResourcesBuildPhase section */
 """
 
-res_list = "".join(f"\t\t\t\t{res_builds[r]} /* {os.path.basename(r)} in Resources */,\n" for r in RESOURCES)
 content += f"""\t\t{BR} /* Resources */ = {{
 \t\t\tisa = PBXResourcesBuildPhase;
 \t\t\tbuildActionMask = 2147483647;
 \t\t\tfiles = (
-{res_list}\t\t\t);
+\t\t\t);
 \t\t\trunOnlyForDeploymentPostprocessing = 0;
 \t\t}};
 """

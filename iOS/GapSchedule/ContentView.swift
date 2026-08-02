@@ -1,147 +1,149 @@
 import SwiftUI
 
-struct TodayView: View {
-    @EnvironmentObject var store: TaskStore
-    @EnvironmentObject var settings: AppSettings
+struct ContentView: View {
     @StateObject private var manager = ScheduleManager.shared
     @State private var selectedDate = Date()
-    @State private var showReminder: (TaskItem, Bool)? = nil
+    @State private var showReminder: (TaskItem, Bool)? = nil  // (task, isOnTime)
     @State private var currentMinute = 0
-    @State private var showEditor = false
 
     private let timer = Timer.publish(every: 30, on: .main, in: .common).autoconnect()
 
     var body: some View {
         ZStack {
-            ScrollView {
-                VStack(spacing: 12) {
-                    // 日期 + 标签卡片
-                    dateCard
-                    // 日历卡片
-                    calendarCard
-                    // 任务卡片
-                    tasksCard
-                }
-                .padding(12)
+            // 主界面
+            VStack(spacing: 0) {
+                headerView
+                Divider().background(Color.white.opacity(0.1))
+                dateBadgeView.padding(.horizontal, 16)
+                Divider().background(Color.white.opacity(0.1))
+                CalendarGridView(selectedDate: $selectedDate)
+                    .padding(.horizontal, 12).padding(.vertical, 6)
+                Divider().background(Color.white.opacity(0.1))
+
+                ScrollView {
+                    taskListView.padding(.horizontal, 16).padding(.vertical, 8)
+                }.frame(maxHeight: .infinity)
+
+                Divider().background(Color.white.opacity(0.1))
+                progressView.padding(.horizontal, 16).padding(.vertical, 10)
             }
-            .background(Color(.systemGroupedBackground))
-            .navigationTitle("GAP")
-            .navigationBarTitleDisplayMode(.inline)
-            .toolbar {
-                ToolbarItem(placement: .navigationBarTrailing) {
-                    Button(action: { showEditor = true }) {
-                        Image(systemName: "slider.horizontal.3")
-                    }
-                }
-            }
-            .sheet(isPresented: $showEditor) { TaskEditorView() }
-            .onReceive(timer) { _ in checkAlerts() }
+            .background(Color(hex: "1a1b1e").ignoresSafeArea())
 
             // 弹窗
             if let (task, isOnTime) = showReminder {
-                Color.black.opacity(0.5).ignoresSafeArea()
+                Color.black.opacity(0.6)
+                    .ignoresSafeArea()
+
                 ReminderPopupView(task: task, isOnTime: isOnTime,
                                   onDismiss: { showReminder = nil })
                     .environmentObject(manager)
-                    .padding(24)
+                    .frame(maxWidth: 320)
             }
+        }
+        .onReceive(timer) { _ in
+            checkAlerts()
+        }
+        .onAppear {
+            NotificationManager.shared.requestAuth()
+            NotificationManager.shared.registerCategories()
+            NotificationManager.shared.scheduleAllIfNeeded()
+            checkAlerts()
         }
     }
 
-    // MARK: - 日期卡片
-    private var dateCard: some View {
+    // MARK: - 子视图
+
+    private var headerView: some View {
         HStack {
-            VStack(alignment: .leading, spacing: 2) {
-                let dow = Calendar.current.component(.weekday, from: Date()) - 1
-                Text(weekdays[dow]).font(.headline).foregroundColor(.orange)
-                Text("\(Calendar.current.component(.month, from: Date()))月\(Calendar.current.component(.day, from: Date()))日")
-                    .font(.largeTitle).fontWeight(.bold)
-            }
+            Text("🔥 Gap 任务日历")
+                .font(.system(size: 18, weight: .bold))
+                .foregroundColor(.white)
             Spacer()
-            Text(manager.resting ? "🌴 休息日" : "🔥 训练日")
-                .font(.subheadline).fontWeight(.semibold)
-                .foregroundColor(manager.resting ? .green : .white)
-                .padding(.horizontal, 14).padding(.vertical, 6)
-                .background(manager.resting ? Color.green.opacity(0.15) : Color.orange, in: Capsule())
+            Text(Date(), style: .time)
+                .font(.system(size: 13))
+                .foregroundColor(Color.white.opacity(0.4))
         }
-        .padding(16)
-        .background(Color(.systemBackground), in: RoundedRectangle(cornerRadius: 16))
-        .shadow(color: .black.opacity(0.03), radius: 8, y: 2)
+        .padding(.horizontal, 16)
+        .padding(.vertical, 12)
     }
 
-    // MARK: - 日历卡片
-    private var calendarCard: some View {
-        CalendarGridView(selectedDate: $selectedDate)
-            .padding(8)
-            .background(Color(.systemBackground), in: RoundedRectangle(cornerRadius: 16))
-            .shadow(color: .black.opacity(0.03), radius: 8, y: 2)
+    private var dateBadgeView: some View {
+        HStack {
+            let dow = Calendar.current.component(.weekday, from: Date()) - 1
+            Text("\(Calendar.current.component(.month, from: Date()))月\(Calendar.current.component(.day, from: Date()))日 \(weekdays[dow])")
+                .font(.system(size: 18, weight: .bold))
+                .foregroundColor(.white)
+            Spacer()
+            if manager.isRestDay {
+                Text("🌴 休息日")
+                    .font(.system(size: 12, weight: .bold))
+                    .foregroundColor(.black)
+                    .padding(.horizontal, 12)
+                    .padding(.vertical, 4)
+                    .background(Color(hex: "57d97c"))
+                    .cornerRadius(12)
+            } else {
+                Text("🔥 训练日")
+                    .font(.system(size: 12, weight: .bold))
+                    .foregroundColor(.black)
+                    .padding(.horizontal, 12)
+                    .padding(.vertical, 4)
+                    .background(Color(hex: "f0a040"))
+                    .cornerRadius(12)
+            }
+        }
+        .padding(.vertical, 8)
     }
 
-    // MARK: - 任务卡片
-    private var tasksCard: some View {
-        VStack(spacing: 0) {
-            ForEach(Array(store.tasks.enumerated()), id: \.element.id) { idx, task in
+    private var taskListView: some View {
+        VStack(spacing: 4) {
+            ForEach(allTasks) { task in
                 let isCur = task.id == manager.currentTaskId
-                taskRow(task, isCurrent: isCur)
-                if idx < store.tasks.count - 1 {
-                    Divider().padding(.leading, 48)
-                }
+                TaskRowView(task: task, isCurrent: isCur)
+                    .environmentObject(manager)
             }
-
-            Divider().padding(.top, 8)
-            // 进度条
-            HStack {
-                Text("已完成 \(manager.dayProgress.checked.count)/\(store.tasks.count)")
-                    .font(.caption).foregroundColor(.secondary)
-                Spacer()
-                ProgressView(value: Double(manager.dayProgress.checked.count),
-                             total: Double(max(1, store.tasks.count)))
-                    .tint(.orange).frame(width: 100)
-            }
-            .padding(.horizontal, 16).padding(.vertical, 8)
         }
-        .background(Color(.systemBackground), in: RoundedRectangle(cornerRadius: 16))
-        .shadow(color: .black.opacity(0.03), radius: 8, y: 2)
     }
 
-    // MARK: - 单行任务
-    private func taskRow(_ task: TaskItem, isCurrent: Bool) -> some View {
-        HStack(spacing: 10) {
-            Text(task.emoji).font(.title3)
-                .frame(width: 28)
-            VStack(alignment: .leading, spacing: 1) {
-                HStack(spacing: 4) {
-                    Text(task.timeRange)
-                        .font(.caption2).fontWeight(.medium).foregroundColor(.orange)
-                    if !manager.dayProgress.checked.contains(task.id) && !manager.resting {
-                        Text("🔔").font(.system(size: 9))
-                    }
-                }
-                Text(task.name)
-                    .font(.subheadline)
-                    .foregroundColor(manager.dayProgress.checked.contains(task.id) ? .secondary : .primary)
-                Text(task.detail).font(.caption2).foregroundColor(.secondary).lineLimit(1)
-            }
+    private var progressView: some View {
+        HStack {
+            Text("今日进度 \(manager.dayProgress.checked.count)/\(allTasks.count)")
+                .font(.system(size: 11))
+                .foregroundColor(Color.white.opacity(0.4))
             Spacer()
-            Button(action: { manager.toggle(task.id) }) {
-                Image(systemName: manager.dayProgress.checked.contains(task.id)
-                      ? "checkmark.circle.fill" : "circle")
-                    .font(.title3)
-                    .foregroundColor(manager.dayProgress.checked.contains(task.id) ? .green : .quaternaryLabel)
+            GeometryReader { geo in
+                ZStack(alignment: .leading) {
+                    Rectangle()
+                        .fill(Color.white.opacity(0.1))
+                        .frame(height: 5)
+                        .cornerRadius(2.5)
+                    Rectangle()
+                        .fill(Color(hex: "f0a040"))
+                        .frame(width: geo.size.width * CGFloat(manager.dayProgress.checked.count) / CGFloat(allTasks.count), height: 5)
+                        .cornerRadius(2.5)
+                        .animation(.easeInOut(duration: 0.3), value: manager.dayProgress.checked.count)
+                }
             }
+            .frame(width: 120, height: 5)
         }
-        .padding(.horizontal, 16).padding(.vertical, 10)
-        .background(isCurrent ? Color.orange.opacity(0.08) : Color.clear)
     }
 
-    // MARK: -
+    // MARK: - 闹钟检测
+
     private func checkAlerts() {
         let now = Calendar.current.component(.hour, from: Date()) * 60
                  + Calendar.current.component(.minute, from: Date())
+
         guard now != currentMinute else { return }
         currentMinute = now
-        if settings.reminderEnabled, let first = manager.tasksNeedingAlert(nowMin: now).first {
+
+        let alerts = manager.tasksNeedingAlert(nowMin: now)
+        if let first = alerts.first {
             showReminder = first
         }
     }
+}
+
+#Preview {
+    ContentView()
 }

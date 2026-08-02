@@ -37,9 +37,9 @@ final class NotificationManager: NSObject {
             let today = Calendar.current.startOfDay(for: Date())
             for dayOffset in 0...1 {
                 guard let date = Calendar.current.date(byAdding: .day, value: dayOffset, to: today) else { continue }
-                if isRestDay(date) { continue }
+                if isSaturday(date) { continue }
 
-                for task in TaskStore.shared.tasks {
+                for task in allTasks {
                     self.schedulePreAlert(for: task, on: date)
                     self.scheduleOnTime(for: task, on: date)
                 }
@@ -91,7 +91,7 @@ final class NotificationManager: NSObject {
     // MARK: - Snooze
 
     func snooze(taskId: Int, minutes: Int) {
-        guard let task = TaskStore.shared.tasks.first(where: { $0.id == taskId }) else { return }
+        guard let task = allTasks.first(where: { $0.id == taskId }) else { return }
 
         let id = "snooze_\(taskId)_\(Int(Date().timeIntervalSince1970))"
         let content = UNMutableNotificationContent()
