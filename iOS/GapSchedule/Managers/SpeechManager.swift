@@ -29,7 +29,7 @@ final class SpeechManager: NSObject {
         }
 
         // 回退到 TTS
-        guard let task = allTasks.first(where: { $0.id == taskId }) else { return }
+        guard let task = defaultTasks.first(where: { $0.id == taskId }) else { return }
         let text = mode == "now" ? task.nowSpeech : task.pre5Speech
         speakTTS(text)
     }

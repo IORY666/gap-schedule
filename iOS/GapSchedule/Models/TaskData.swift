@@ -1,22 +1,19 @@
 import Foundation
 
-/// 单个任务定义
-struct TaskItem: Identifiable, Codable {
+struct TaskItem: Identifiable, Codable, Equatable {
     let id: Int
-    let emoji: String
-    let timeRange: String    // "07:00-07:45"
-    let name: String
-    let detail: String
+    var emoji: String
+    var timeRange: String
+    var name: String
+    var detail: String
 
     var startHour: Int { Int(timeRange.split(separator: "-")[0].split(separator: ":")[0]) ?? 0 }
     var startMin:  Int { Int(timeRange.split(separator: "-")[0].split(separator: ":")[1]) ?? 0 }
     var endHour:   Int { Int(timeRange.split(separator: "-")[1].split(separator: ":")[0]) ?? 0 }
     var endMin:    Int { Int(timeRange.split(separator: "-")[1].split(separator: ":")[1]) ?? 0 }
-
     var startMinutes: Int { startHour * 60 + startMin }
     var endMinutes:   Int { endHour * 60 + endMin }
 
-    /// 语音播报文本
     var speechText: String {
         switch id {
         case 0:  return "空腹有氧运动"
@@ -36,33 +33,24 @@ struct TaskItem: Identifiable, Codable {
         default: return name
         }
     }
-
-    /// 提前10分钟预告语音
     var pre10Speech: String { "10分钟后，\(speechText)" }
-    /// 提前5分钟预告语音
     var pre5Speech: String { "5分钟后，\(speechText)" }
-    /// 到点语音
-    var nowSpeech: String {
-        id == 13 ? "该睡觉了，放下手机" : "该\(speechText)了"
-    }
+    var nowSpeech: String { id == 13 ? "该睡觉了，放下手机" : "该\(speechText)了" }
 }
 
-/// 每日完成状态
 struct DayProgress: Codable {
-    var checked: Set<Int> = []      // 已完成的任务ID
-    var dismissed: Set<Int> = []    // "离开"的任务ID
+    var checked: Set<Int> = []
+    var dismissed: Set<Int> = []
 }
 
-/// 提醒模式
 enum ReminderMode: String, CaseIterable {
     case tenMin = "提前10分钟"
     case fiveMin = "提前5分钟"
     case onTime = "到点"
 }
 
-// MARK: - 全局任务数据
-
-let allTasks: [TaskItem] = [
+// 唯一的默认任务数据源
+let defaultTasks: [TaskItem] = [
     TaskItem(id: 0,  emoji: "🏃", timeRange: "07:00-07:45", name: "空腹有氧45min",     detail: "快走/慢跑/跳绳"),
     TaskItem(id: 1,  emoji: "🧹", timeRange: "07:45-08:00", name: "洗漱整理",           detail: "冲澡换衣服"),
     TaskItem(id: 2,  emoji: "🛒", timeRange: "08:00-08:30", name: "买菜",               detail: "菜市场/超市"),
@@ -81,8 +69,8 @@ let allTasks: [TaskItem] = [
 
 let weekdays = ["周日","周一","周二","周三","周四","周五","周六"]
 
-func isSaturday(_ date: Date = Date()) -> Bool {
-    // return Calendar.current.component(.weekday, from: date) == 7  // 正式版
+func isRestDay(_ date: Date = Date()) -> Bool {
+    // return Calendar.current.component(.weekday, from: date) == 7
     return false  // 测试模式
 }
 

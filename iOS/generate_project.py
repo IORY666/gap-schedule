@@ -19,6 +19,7 @@ SWIFT_FILES = [
     "GapSchedule/Views/ReminderPopupView.swift",
     "GapSchedule/Views/TaskEditorView.swift",
     "GapSchedule/Views/DashboardView.swift",
+    "GapSchedule/Views/SettingsView.swift",
     "GapSchedule/Managers/NotificationManager.swift",
     "GapSchedule/Managers/ScheduleManager.swift",
     "GapSchedule/Managers/SpeechManager.swift",

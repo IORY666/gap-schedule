@@ -94,7 +94,7 @@ struct DailyStats {
         var s = DailyStats()
         let all = (UserDefaults.standard.dictionary(forKey: "gap_all_checks") as? [String: [String: Bool]]) ?? [:]
         let today = Date()
-        let tasks = currentTasks
+        let tasks = TaskStore.shared.tasks
         var totalDone = 0, totalTasks = 0
 
         var rates: [(String, Double)] = []

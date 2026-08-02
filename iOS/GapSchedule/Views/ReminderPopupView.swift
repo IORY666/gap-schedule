@@ -86,8 +86,10 @@ struct ReminderPopupView: View {
         .shadow(color: .black.opacity(0.5), radius: 30)
         .onAppear {
             borderGlow = true
-            let mode = isOnTime ? "now" : "pre"
-            SpeechManager.shared.speak(taskId: task.id, mode: mode)
+            if AppSettings.shared.voiceEnabled {
+                let mode = isOnTime ? "now" : "pre"
+                SpeechManager.shared.speak(taskId: task.id, mode: mode)
+            }
         }
         .onDisappear { SpeechManager.shared.stop() }
         .onReceive(countdown) { _ in

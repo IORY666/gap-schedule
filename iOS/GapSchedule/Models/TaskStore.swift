@@ -1,50 +1,44 @@
 import Foundation
+import Combine
 
-/// 任务持久化管理
-final class TaskStore {
+/// 任务数据唯一来源（ObservableObject，SwiftUI 原生绑定）
+final class TaskStore: ObservableObject {
     static let shared = TaskStore()
-    private let key = "gap_custom_tasks"
-    private let nextIdKey = "gap_next_task_id"
-    private let defaultCount = 14
+    @Published var tasks: [TaskItem] = defaultTasks
+    private let saveKey = "gap_task_list"
 
-    var nextId: Int {
-        let id = UserDefaults.standard.integer(forKey: nextIdKey)
-        return max(id, defaultCount)
+    private init() { loadFromDisk() }
+
+    func loadFromDisk() {
+        guard let data = UserDefaults.standard.data(forKey: saveKey),
+              let saved = try? JSONDecoder().decode([TaskItem].self, from: data), !saved.isEmpty
+        else { tasks = defaultTasks; return }
+        tasks = saved
     }
 
-    func load() -> [TaskItem] {
-        guard let data = UserDefaults.standard.data(forKey: key),
-              let items = try? JSONDecoder().decode([TaskItem].self, from: data),
-              !items.isEmpty
-        else { return allTasks } // 返回默认任务
-        return items
+    func save(_ t: [TaskItem]) {
+        tasks = t
+        if let d = try? JSONEncoder().encode(t) { UserDefaults.standard.set(d, forKey: saveKey) }
     }
 
-    func save(_ tasks: [TaskItem]) {
-        guard let data = try? JSONEncoder().encode(tasks) else { return }
-        UserDefaults.standard.set(data, forKey: key)
-        // 更新全局可变任务列表
-        currentTasks = tasks
+    func resetToDefault() {
+        UserDefaults.standard.removeObject(forKey: saveKey)
+        tasks = defaultTasks
     }
-
-    func reset() {
-        UserDefaults.standard.removeObject(forKey: key)
-        UserDefaults.standard.removeObject(forKey: nextIdKey)
-        currentTasks = allTasks // 恢复默认
-    }
-
 }
 
-extension Notification.Name {
-    static let tasksDidChange = Notification.Name("tasksDidChange")
-}
+/// App 设置（语音开关等）
+final class AppSettings: ObservableObject {
+    static let shared = AppSettings()
+    @Published var voiceEnabled: Bool {
+        didSet { UserDefaults.standard.set(voiceEnabled, forKey: "gap_voice_enabled") }
+    }
+    @Published var reminderEnabled: Bool {
+        didSet { UserDefaults.standard.set(reminderEnabled, forKey: "gap_reminder_enabled") }
+    }
 
-// MARK: - 全局可变任务列表
-
-var currentTasks: [TaskItem] = {
-    TaskStore.shared.load()
-}() {
-    didSet {
-        NotificationCenter.default.post(name: .tasksDidChange, object: currentTasks)
+    private init() {
+        voiceEnabled = UserDefaults.standard.object(forKey: "gap_voice_enabled") as? Bool ?? true
+        reminderEnabled = UserDefaults.standard.object(forKey: "gap_reminder_enabled") as? Bool ?? true
     }
 }
