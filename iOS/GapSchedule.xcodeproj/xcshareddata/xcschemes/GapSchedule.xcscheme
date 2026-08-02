@@ -5,7 +5,7 @@
          <BuildActionEntry buildForTesting="YES" buildForRunning="YES" buildForProfiling="YES" buildForArchiving="YES" buildForAnalyzing="YES">
             <BuildableReference
                BuildableIdentifier="primary"
-               BlueprintIdentifier="AD3857CC7EC94B3DA4D12041"
+               BlueprintIdentifier="9111FAEB822E4F4CB22F0131"
                BuildableName="GapSchedule.app"
                BlueprintName="GapSchedule"
                ReferencedContainer="container:GapSchedule.xcodeproj">
@@ -14,7 +14,7 @@
       		<BuildActionEntry buildForTesting="YES" buildForRunning="YES" buildForProfiling="YES" buildForArchiving="YES" buildForAnalyzing="YES">
 			<BuildableReference
 				BuildableIdentifier="primary"
-				BlueprintIdentifier="C15A6833C9BE40A0879FD0AD"
+				BlueprintIdentifier="871F98F243E0464D932C5C5E"
 				BuildableName="GapScheduleWidget.appex"
 				BlueprintName="GapScheduleWidget"
 				ReferencedContainer="container:GapSchedule.xcodeproj">
@@ -25,12 +25,12 @@
    <TestAction buildConfiguration="Debug" selectedDebuggerIdentifier="Xcode.DebuggerFoundation.Debugger.LLDB" selectedLauncherIdentifier="Xcode.DebuggerFoundation.Launcher.LLDB" shouldUseLaunchSchemeArgsEnv="YES"><Testables></Testables></TestAction>
    <LaunchAction buildConfiguration="Debug" selectedDebuggerIdentifier="Xcode.DebuggerFoundation.Debugger.LLDB" selectedLauncherIdentifier="Xcode.DebuggerFoundation.Launcher.LLDB" launchStyle="0" useCustomWorkingDirectory="NO" ignoresPersistentStateOnLaunch="NO" debugDocumentVersioning="YES" debugServiceExtension="internal" allowLocationSimulation="YES">
       <BuildableProductRunnable runnableDebuggingMode="0">
-         <BuildableReference BuildableIdentifier="primary" BlueprintIdentifier="AD3857CC7EC94B3DA4D12041" BuildableName="GapSchedule.app" BlueprintName="GapSchedule" ReferencedContainer="container:GapSchedule.xcodeproj"></BuildableReference>
+         <BuildableReference BuildableIdentifier="primary" BlueprintIdentifier="9111FAEB822E4F4CB22F0131" BuildableName="GapSchedule.app" BlueprintName="GapSchedule" ReferencedContainer="container:GapSchedule.xcodeproj"></BuildableReference>
       </BuildableProductRunnable>
    </LaunchAction>
    <ProfileAction buildConfiguration="Release" shouldUseLaunchSchemeArgsEnv="YES" savedToolIdentifier="" useCustomWorkingDirectory="NO" debugDocumentVersioning="YES">
       <BuildableProductRunnable runnableDebuggingMode="0">
-         <BuildableReference BuildableIdentifier="primary" BlueprintIdentifier="AD3857CC7EC94B3DA4D12041" BuildableName="GapSchedule.app" BlueprintName="GapSchedule" ReferencedContainer="container:GapSchedule.xcodeproj"></BuildableReference>
+         <BuildableReference BuildableIdentifier="primary" BlueprintIdentifier="9111FAEB822E4F4CB22F0131" BuildableName="GapSchedule.app" BlueprintName="GapSchedule" ReferencedContainer="container:GapSchedule.xcodeproj"></BuildableReference>
       </BuildableProductRunnable>
    </ProfileAction>
    <ArchiveAction buildConfiguration="Release" revealArchiveInOrganizer="YES"></ArchiveAction>
