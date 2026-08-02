@@ -20,6 +20,10 @@ jobs:
         working-directory: iOS
         run: python3 generate_project.py
 
+      - name: 注入 Widget Extension target
+        working-directory: iOS
+        run: python3 add_widget_target.py
+
       - name: 构建 Archive（无签名）
         working-directory: iOS
         run: |
