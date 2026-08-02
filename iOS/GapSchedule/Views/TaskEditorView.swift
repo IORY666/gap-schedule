@@ -49,6 +49,9 @@ struct TaskEditorView: View {
 
 struct EditableItem {
     var emoji: String; var time: String; var name: String; var detail: String; var id: Int
+    init(emoji: String, time: String, name: String, detail: String, id: Int) {
+        self.emoji = emoji; self.time = time; self.name = name; self.detail = detail; self.id = id
+    }
     init(from t: TaskItem) { emoji = t.emoji; time = t.timeRange; name = t.name; detail = t.detail; id = t.id }
     static func new(id: Int) -> EditableItem { EditableItem(emoji: "📌", time: "12:00-13:00", name: "新任务", detail: "点击编辑", id: id) }
     func toTask() -> TaskItem { TaskItem(id: id, emoji: emoji, timeRange: time, name: name, detail: detail) }
