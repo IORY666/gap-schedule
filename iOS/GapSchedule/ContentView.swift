@@ -1,10 +1,15 @@
 import SwiftUI
 
 struct ContentView: View {
+    @EnvironmentObject var store: TaskStore
+    @EnvironmentObject var settings: AppSettings
     @StateObject private var manager = ScheduleManager.shared
     @State private var selectedDate = Date()
-    @State private var showReminder: (TaskItem, Bool)? = nil  // (task, isOnTime)
+    @State private var showReminder: (TaskItem, Bool)? = nil
     @State private var currentMinute = 0
+    @State private var showEditor = false
+    @State private var showDashboard = false
+    @State private var showSettings = false
 
     private let timer = Timer.publish(every: 30, on: .main, in: .common).autoconnect()
 
@@ -43,6 +48,9 @@ struct ContentView: View {
         .onReceive(timer) { _ in
             checkAlerts()
         }
+        .sheet(isPresented: $showEditor) { TaskEditorView().environmentObject(store) }
+        .sheet(isPresented: $showDashboard) { DashboardView() }
+        .sheet(isPresented: $showSettings) { SettingsView().environmentObject(store).environmentObject(settings) }
         .onAppear {
             NotificationManager.shared.requestAuth()
             NotificationManager.shared.registerCategories()
@@ -55,16 +63,13 @@ struct ContentView: View {
 
     private var headerView: some View {
         HStack {
-            Text("🔥 Gap 任务日历")
-                .font(.system(size: 18, weight: .bold))
-                .foregroundColor(.white)
+            Text("GAP").font(.title2).fontWeight(.bold)
             Spacer()
-            Text(Date(), style: .time)
-                .font(.system(size: 13))
-                .foregroundColor(Color.white.opacity(0.4))
-        }
-        .padding(.horizontal, 16)
-        .padding(.vertical, 12)
+            Button(action: { showSettings = true }) { Image(systemName: "gearshape").font(.title3) }
+            Button(action: { showDashboard = true }) { Image(systemName: "chart.bar").font(.title3) }
+            Button(action: { showEditor = true }) { Image(systemName: "pencil").font(.title3) }
+            Text(Date(), style: .time).font(.caption).foregroundColor(.secondary)
+        }.padding(.horizontal, 16).padding(.vertical, 10)
     }
 
     private var dateBadgeView: some View {
@@ -97,7 +102,7 @@ struct ContentView: View {
 
     private var taskListView: some View {
         VStack(spacing: 4) {
-            ForEach(allTasks) { task in
+            ForEach(store.tasks) { task in
                 let isCur = task.id == manager.currentTaskId
                 TaskRowView(task: task, isCurrent: isCur)
                     .environmentObject(manager)
@@ -107,7 +112,7 @@ struct ContentView: View {
 
     private var progressView: some View {
         HStack {
-            Text("今日进度 \(manager.dayProgress.checked.count)/\(allTasks.count)")
+            Text("今日进度 \(manager.dayProgress.checked.count)/\(store.tasks.count)")
                 .font(.system(size: 11))
                 .foregroundColor(Color.white.opacity(0.4))
             Spacer()
@@ -119,7 +124,7 @@ struct ContentView: View {
                         .cornerRadius(2.5)
                     Rectangle()
                         .fill(Color(hex: "f0a040"))
-                        .frame(width: geo.size.width * CGFloat(manager.dayProgress.checked.count) / CGFloat(allTasks.count), height: 5)
+                        .frame(width: geo.size.width * CGFloat(manager.dayProgress.checked.count) / CGFloat(store.tasks.count), height: 5)
                         .cornerRadius(2.5)
                         .animation(.easeInOut(duration: 0.3), value: manager.dayProgress.checked.count)
                 }

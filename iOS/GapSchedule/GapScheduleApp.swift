@@ -3,10 +3,14 @@ import SwiftUI
 @main
 struct GapScheduleApp: App {
     @UIApplicationDelegateAdaptor(AppDelegate.self) var delegate
+    @StateObject private var store = TaskStore.shared
+    @StateObject private var settings = AppSettings.shared
 
     var body: some Scene {
         WindowGroup {
             ContentView()
+                .environmentObject(store)
+                .environmentObject(settings)
                 .preferredColorScheme(.dark)
         }
     }
