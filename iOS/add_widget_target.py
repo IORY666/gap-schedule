@@ -160,6 +160,7 @@ widget_configs = f"""\t\t{WCB1} /* Debug */ = {{
 \t\t\t\tMARKETING_VERSION = 1.0;
 \t\t\t\tPRODUCT_BUNDLE_IDENTIFIER = com.gap.schedule.widget;
 \t\t\t\tPRODUCT_NAME = GapScheduleWidget;
+\t\t\t\tSDKROOT = iphoneos;
 \t\t\t\tSKIP_INSTALL = YES;
 \t\t\t\tSUPPORTED_PLATFORMS = iphoneos;
 \t\t\t\tSWIFT_VERSION = 5.0;
@@ -180,6 +181,7 @@ widget_configs = f"""\t\t{WCB1} /* Debug */ = {{
 \t\t\t\tMARKETING_VERSION = 1.0;
 \t\t\t\tPRODUCT_BUNDLE_IDENTIFIER = com.gap.schedule.widget;
 \t\t\t\tPRODUCT_NAME = GapScheduleWidget;
+\t\t\t\tSDKROOT = iphoneos;
 \t\t\t\tSKIP_INSTALL = YES;
 \t\t\t\tSUPPORTED_PLATFORMS = iphoneos;
 \t\t\t\tSWIFT_VERSION = 5.0;
@@ -198,6 +200,41 @@ widget_clist = f"""\t\t{WCL} /* Build configuration list for GapScheduleWidget *
 \t\t\tdefaultConfigurationName = Release;
 \t\t}};"""
 content = content.replace(clist_end, widget_clist + "\n" + clist_end)
+
+# 13. 提取 Project UUID (rootObject)
+proj_uuid = re.search(r'rootObject = ([A-F0-9]+)', content)
+p_uuid = proj_uuid.group(1) if proj_uuid else "PROJECT_UUID_NOT_FOUND"
+
+# 14. 添加 Target Dependency (App → Widget)
+proxy_marker = "/* End PBXNativeTarget section */"
+proxy_section = f"""/* Begin PBXContainerItemProxy section */
+\t\t{TPX} /* PBXContainerItemProxy */ = {{
+\t\t\tisa = PBXContainerItemProxy;
+\t\t\tcontainerPortal = {p_uuid} /* Project object */;
+\t\t\tproxyType = 1;
+\t\t\tremoteGlobalIDString = {WNT};
+\t\t\tremoteInfo = GapScheduleWidget;
+\t\t}};
+/* End PBXContainerItemProxy section */
+
+/* Begin PBXTargetDependency section */
+\t\t{TDP} /* PBXTargetDependency */ = {{
+\t\t\tisa = PBXTargetDependency;
+\t\t\ttarget = {WNT} /* GapScheduleWidget */;
+\t\t\ttargetProxy = {TPX} /* PBXContainerItemProxy */;
+\t\t}};
+/* End PBXTargetDependency section */
+"""
+content = content.replace(proxy_marker, proxy_marker + "\n\n" + proxy_section)
+
+# 15. 在 App target 的 dependencies 中添加 Widget 依赖
+app_nt_uuid2 = re.search(r'([A-F0-9]{24}) /\* GapSchedule \*/ = \{isa = PBXNativeTarget;', content)
+if app_nt_uuid2:
+    nt_id = app_nt_uuid2.group(1)
+    content = content.replace(
+        f"{nt_id} /* GapSchedule */ = {{\n\t\t\tisa = PBXNativeTarget;\n\t\t\tbuildConfigurationList",
+        f"{nt_id} /* GapSchedule */ = {{\n\t\t\tisa = PBXNativeTarget;\n\t\t\tdependencies = (\n\t\t\t\t{TDP} /* PBXTargetDependency */,\n\t\t\t);\n\t\t\tbuildConfigurationList"
+    )
 
 # 保存
 with open(path, "w", encoding="utf-8") as f:
