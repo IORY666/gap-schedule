@@ -236,6 +236,32 @@ if app_nt_uuid2:
         f"{nt_id} /* GapSchedule */ = {{\n\t\t\tisa = PBXNativeTarget;\n\t\t\tdependencies = (\n\t\t\t\t{TDP} /* PBXTargetDependency */,\n\t\t\t);\n\t\t\tbuildConfigurationList"
     )
 
+# 16. 修补 xcscheme——在 BuildAction 中加入 Widget target
+scheme_path = "GapSchedule.xcodeproj/xcshareddata/xcschemes/GapSchedule.xcscheme"
+if os.path.exists(scheme_path):
+    with open(scheme_path, "r", encoding="utf-8") as f:
+        scheme = f.read()
+
+    # 在 BuildAction 的 BuildActionEntries 中添加 Widget target 的 entry
+    widget_entry = f"""\t\t<BuildActionEntry buildForTesting=\"YES\" buildForRunning=\"YES\" buildForProfiling=\"YES\" buildForArchiving=\"YES\" buildForAnalyzing=\"YES\">
+\t\t\t<BuildableReference
+\t\t\t\tBuildableIdentifier=\"primary\"
+\t\t\t\tBlueprintIdentifier=\"{WNT}\"
+\t\t\t\tBuildableName=\"GapScheduleWidget.appex\"
+\t\t\t\tBlueprintName=\"GapScheduleWidget\"
+\t\t\t\tReferencedContainer=\"container:GapSchedule.xcodeproj\">
+\t\t\t</BuildableReference>
+\t\t</BuildActionEntry>"""
+
+    # 插入到最后一个 </BuildActionEntry> 之后、</BuildActionEntries> 之前
+    scheme = scheme.replace(
+        "</BuildActionEntries>",
+        widget_entry + "\n\t\t</BuildActionEntries>"
+    )
+    with open(scheme_path, "w", encoding="utf-8") as f:
+        f.write(scheme)
+    print("xcscheme updated with Widget target")
+
 # 保存
 with open(path, "w", encoding="utf-8") as f:
     f.write(content)
