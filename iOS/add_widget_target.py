@@ -24,11 +24,13 @@ WGROUP = uid24()     # Widget group
 ECP = uid24()  # Embed App Extensions copy files phase
 TPX = uid24()  # Target dependency proxy
 TDP = uid24()  # Target dependency
+EWBF = uid24() # Embed Widget build file
 
 # 2. 在 PBXBuildFile section 末尾插入 Widget build files
 build_marker = "/* End PBXBuildFile section */"
 widget_build_files = f"""\t\t{WBF_SWIFT} /* GAPWidget.swift in Sources */ = {{isa = PBXBuildFile; fileRef = {WFR_SWIFT} /* GAPWidget.swift */; }};
-\t\t{WBF_PLIST} /* Info.plist in Resources */ = {{isa = PBXBuildFile; fileRef = {WFR_PLIST} /* Info.plist */; }};"""
+\t\t{WBF_PLIST} /* Info.plist in Resources */ = {{isa = PBXBuildFile; fileRef = {WFR_PLIST} /* Info.plist */; }};
+\t\t{EWBF} /* GapScheduleWidget.appex in Embed App Extensions */ = {{isa = PBXBuildFile; fileRef = {WPR} /* GapScheduleWidget.appex */; }};"""
 content = content.replace(build_marker, widget_build_files + "\n" + build_marker)
 
 # 3. 在 PBXFileReference section 末尾插入 Widget file refs
@@ -111,6 +113,7 @@ copy_files_phase = f"""\t\t{ECP} /* Embed App Extensions */ = {{
 \t\t\tdstPath = "";
 \t\t\tdstSubfolderSpec = 13;
 \t\t\tfiles = (
+\t\t\t\t{EWBF} /* GapScheduleWidget.appex in Embed App Extensions */,
 \t\t\t);
 \t\t\trunOnlyForDeploymentPostprocessing = 0;
 \t\t}};
