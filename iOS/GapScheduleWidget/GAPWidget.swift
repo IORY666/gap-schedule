@@ -147,6 +147,7 @@ struct GAPMediumView: View {
 
 // MARK: - Widget 主体
 
+@main
 struct GAPWidget: Widget {
     let kind = "GAPWidget"
 
