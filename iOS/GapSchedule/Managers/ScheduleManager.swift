@@ -8,7 +8,7 @@ final class ScheduleManager: ObservableObject {
     @Published var dayProgress = DayProgress()
     @Published var snoozedTasks: [Int: Int] = [:] // [taskId: nextAlertMinute]
     @Published var currentTaskId: Int? = nil
-    @Published var isRestDay = false
+    @Published var resting = false
 
     private var timer: Timer?
     private let storeKey = "gap_day_progress"
@@ -59,9 +59,9 @@ final class ScheduleManager: ObservableObject {
     }
 
     func updateCurrentTask() {
-        isRestDay = isRestDay()
+        resting = isRestDay()
 
-        if isRestDay {
+        if resting {
             currentTaskId = nil
             return
         }

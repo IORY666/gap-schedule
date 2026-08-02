@@ -11,11 +11,11 @@ RESOURCES = sorted([f.replace("\\", "/") for f in _glob.glob(f"{VOICE_DIR}/*.mp3
 
 SWIFT_FILES = [
     "GapSchedule/GapScheduleApp.swift",
+    "GapSchedule/MainTabView.swift",
     "GapSchedule/ContentView.swift",
     "GapSchedule/Models/TaskData.swift",
     "GapSchedule/Models/TaskStore.swift",
     "GapSchedule/Views/CalendarGridView.swift",
-    "GapSchedule/Views/TaskRowView.swift",
     "GapSchedule/Views/ReminderPopupView.swift",
     "GapSchedule/Views/TaskEditorView.swift",
     "GapSchedule/Views/DashboardView.swift",
